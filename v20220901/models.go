@@ -20,6 +20,37 @@ import (
     "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/json"
 )
 
+type APIResource struct {
+	// 资源 ID。
+	Id *string `json:"Id,omitnil,omitempty" name:"Id"`
+
+	// 资源名称。
+	Name *string `json:"Name,omitnil,omitempty" name:"Name"`
+
+	// API 资源关联的 API 服务 ID 列表。
+	APIServiceIds []*string `json:"APIServiceIds,omitnil,omitempty" name:"APIServiceIds"`
+
+	// 资源路径。
+	Path *string `json:"Path,omitnil,omitempty" name:"Path"`
+
+	// 请求方法列表。支持以下取值：GET, POST, PUT, HEAD, PATCH, OPTIONS, DELETE。
+	Methods []*string `json:"Methods,omitnil,omitempty" name:"Methods"`
+
+	// 请求内容匹配规则的具体内容，需符合表达式语法，详细规范参见产品文档。
+	RequestConstraint *string `json:"RequestConstraint,omitnil,omitempty" name:"RequestConstraint"`
+}
+
+type APIService struct {
+	// API 服务 ID。
+	Id *string `json:"Id,omitnil,omitempty" name:"Id"`
+
+	// API 服务名称。
+	Name *string `json:"Name,omitnil,omitempty" name:"Name"`
+
+	// 基础路径。
+	BasePath *string `json:"BasePath,omitnil,omitempty" name:"BasePath"`
+}
+
 type AccelerateMainland struct {
 	// 是否开启中国大陆加速优化配置，取值有：
 	// <li>on：开启；</li>
@@ -629,6 +660,15 @@ type AscriptionInfo struct {
 
 	// 记录值。
 	RecordValue *string `json:"RecordValue,omitnil,omitempty" name:"RecordValue"`
+}
+
+type AudioTemplateInfo struct {
+	// 音频流的编码格式。可选值为：
+	// <li>libfdk_aac。</li>
+	Codec *string `json:"Codec,omitnil,omitempty" name:"Codec"`
+
+	// 音频通道数，可选值：<li>2：双通道。</li>默认值：2。
+	AudioChannel *uint64 `json:"AudioChannel,omitnil,omitempty" name:"AudioChannel"`
 }
 
 type AuthenticationParameters struct {
@@ -1480,6 +1520,38 @@ type ClientAttestationRule struct {
 type ClientAttestationRules struct {
 	// 客户端认证的列表。使用 ModifySecurityPolicy 修改 Web 防护配置时：<li>  若未指定 SecurityPolicy.BotManagement.ClientAttestationRules 中的 Rules 参数，或 Rules 参数长度为零：清空所有客户端认证规则配置。</li> <li> 若 SecurityPolicy.BotManagement 参数中，未指定 ClientAttestationRules 参数值：保持已有客户端认证规则配置，不做修改。</li>
 	Rules []*ClientAttestationRule `json:"Rules,omitnil,omitempty" name:"Rules"`
+}
+
+type ClientAttester struct {
+	// 认证选项 ID。
+	Id *string `json:"Id,omitnil,omitempty" name:"Id"`
+
+	// 认证选项名称。
+	Name *string `json:"Name,omitnil,omitempty" name:"Name"`
+
+	// 认证规则类型。仅出参返回，取值有：
+	// <li>PRESET: 系统预置规则，仅允许修改 AttesterDuration；</li>
+	// <li>CUSTOM: 用户自定义规则。</li>
+	Type *string `json:"Type,omitnil,omitempty" name:"Type"`
+
+	// 认证方法。取值有：
+	// <li>TC-RCE: 使用风险识别 RCE 进行认证；</li>
+	// <li>TC-CAPTCHA: 使用天御验证码进行认证。</li>
+	AttesterSource *string `json:"AttesterSource,omitnil,omitempty" name:"AttesterSource"`
+
+	// 认证有效时间。默认为 60s，支持的单位有：
+	// <li>s：秒，取值范围 60～43200；</li>
+	// <li>m：分，取值范围 1～720；</li>
+	// <li>h：小时，取值范围 1～12。</li>
+	AttesterDuration *string `json:"AttesterDuration,omitnil,omitempty" name:"AttesterDuration"`
+
+	// TC-RCE 认证的配置信息。
+	// <li>当 AttesterSource 参数值为 TC-RCE 时，此字段必填。</li>
+	TCRCEOption *TCRCEOption `json:"TCRCEOption,omitnil,omitempty" name:"TCRCEOption"`
+
+	// TC-CAPTCHA 认证的配置信息。
+	// <li>当 AttesterSource 参数值为 TC-CAPTCHA 时，此字段必填。</li>
+	TCCaptchaOption *TCCaptchaOption `json:"TCCaptchaOption,omitnil,omitempty" name:"TCCaptchaOption"`
 }
 
 type ClientFiltering struct {
@@ -2762,6 +2834,113 @@ func (r *CreateFunctionRuleResponse) FromJsonString(s string) error {
 }
 
 // Predefined struct for user
+type CreateJustInTimeTranscodeTemplateRequestParams struct {
+	// 站点ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 即时转码模板名称，长度限制：64 个字符。
+	TemplateName *string `json:"TemplateName,omitnil,omitempty" name:"TemplateName"`
+
+	// 模板描述信息，长度限制：256 个字符。默认为空。
+	Comment *string `json:"Comment,omitnil,omitempty" name:"Comment"`
+
+	// 启用视频流开关，取值：
+	// <li>on：开启；</li>
+	// <li>off：关闭。</li>默认值：on。
+	VideoStreamSwitch *string `json:"VideoStreamSwitch,omitnil,omitempty" name:"VideoStreamSwitch"`
+
+	// 启用音频流开关，取值：
+	// <li>on：开启；</li>
+	// <li>off：关闭。</li>默认值：on。
+	AudioStreamSwitch *string `json:"AudioStreamSwitch,omitnil,omitempty" name:"AudioStreamSwitch"`
+
+	// 视频流配置参数，当 VideoStreamSwitch 为 on，该字段必填。
+	VideoTemplate *VideoTemplateInfo `json:"VideoTemplate,omitnil,omitempty" name:"VideoTemplate"`
+
+	// 音频流配置参数，当 AudioStreamSwitch 为 on，该字段必填。
+	AudioTemplate *AudioTemplateInfo `json:"AudioTemplate,omitnil,omitempty" name:"AudioTemplate"`
+}
+
+type CreateJustInTimeTranscodeTemplateRequest struct {
+	*tchttp.BaseRequest
+	
+	// 站点ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 即时转码模板名称，长度限制：64 个字符。
+	TemplateName *string `json:"TemplateName,omitnil,omitempty" name:"TemplateName"`
+
+	// 模板描述信息，长度限制：256 个字符。默认为空。
+	Comment *string `json:"Comment,omitnil,omitempty" name:"Comment"`
+
+	// 启用视频流开关，取值：
+	// <li>on：开启；</li>
+	// <li>off：关闭。</li>默认值：on。
+	VideoStreamSwitch *string `json:"VideoStreamSwitch,omitnil,omitempty" name:"VideoStreamSwitch"`
+
+	// 启用音频流开关，取值：
+	// <li>on：开启；</li>
+	// <li>off：关闭。</li>默认值：on。
+	AudioStreamSwitch *string `json:"AudioStreamSwitch,omitnil,omitempty" name:"AudioStreamSwitch"`
+
+	// 视频流配置参数，当 VideoStreamSwitch 为 on，该字段必填。
+	VideoTemplate *VideoTemplateInfo `json:"VideoTemplate,omitnil,omitempty" name:"VideoTemplate"`
+
+	// 音频流配置参数，当 AudioStreamSwitch 为 on，该字段必填。
+	AudioTemplate *AudioTemplateInfo `json:"AudioTemplate,omitnil,omitempty" name:"AudioTemplate"`
+}
+
+func (r *CreateJustInTimeTranscodeTemplateRequest) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *CreateJustInTimeTranscodeTemplateRequest) FromJsonString(s string) error {
+	f := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(s), &f); err != nil {
+		return err
+	}
+	delete(f, "ZoneId")
+	delete(f, "TemplateName")
+	delete(f, "Comment")
+	delete(f, "VideoStreamSwitch")
+	delete(f, "AudioStreamSwitch")
+	delete(f, "VideoTemplate")
+	delete(f, "AudioTemplate")
+	if len(f) > 0 {
+		return tcerr.NewTencentCloudSDKError("ClientError.BuildRequestError", "CreateJustInTimeTranscodeTemplateRequest has unknown keys!", "")
+	}
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type CreateJustInTimeTranscodeTemplateResponseParams struct {
+	// 即时转码模板唯一标识，用于即时转码 URL 拼接。
+	TemplateId *string `json:"TemplateId,omitnil,omitempty" name:"TemplateId"`
+
+	// 唯一请求 ID，由服务端生成，每次请求都会返回（若请求因其他原因未能抵达服务端，则该次请求不会获得 RequestId）。定位问题时需要提供该次请求的 RequestId。
+	RequestId *string `json:"RequestId,omitnil,omitempty" name:"RequestId"`
+}
+
+type CreateJustInTimeTranscodeTemplateResponse struct {
+	*tchttp.BaseResponse
+	Response *CreateJustInTimeTranscodeTemplateResponseParams `json:"Response"`
+}
+
+func (r *CreateJustInTimeTranscodeTemplateResponse) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *CreateJustInTimeTranscodeTemplateResponse) FromJsonString(s string) error {
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
 type CreateL4ProxyRequestParams struct {
 	// 站点 ID。
 	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
@@ -3384,6 +3563,9 @@ type CreateOriginGroupRequestParams struct {
 	// 站点 ID
 	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
 
+	// 源站记录信息，此参数必填。
+	Records []*OriginRecord `json:"Records,omitnil,omitempty" name:"Records"`
+
 	// 源站组名称，可输入1 - 200个字符，允许的字符为 a - z, A - Z, 0 - 9, _, - 。
 	Name *string `json:"Name,omitnil,omitempty" name:"Name"`
 
@@ -3391,9 +3573,6 @@ type CreateOriginGroupRequestParams struct {
 	// <li>GENERAL：通用型源站组，仅支持添加 IP/域名 源站，可以被域名服务、规则引擎、四层代理、通用型负载均衡、HTTP 专用型负载均衡引用；</li>
 	// <li>HTTP： HTTP 专用型源站组，支持添加 IP/域名、对象存储源站作为源站，无法被四层代理引用，仅支持被添加加速域名、规则引擎-修改源站、HTTP 专用型负载均衡引用。</li>
 	Type *string `json:"Type,omitnil,omitempty" name:"Type"`
-
-	// 源站记录信息，此参数必填。
-	Records []*OriginRecord `json:"Records,omitnil,omitempty" name:"Records"`
 
 	// 回源 Host Header，仅 Type = HTTP 时传入生效，规则引擎修改 Host Header 配置优先级高于源站组的 Host Header。
 	HostHeader *string `json:"HostHeader,omitnil,omitempty" name:"HostHeader"`
@@ -3405,6 +3584,9 @@ type CreateOriginGroupRequest struct {
 	// 站点 ID
 	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
 
+	// 源站记录信息，此参数必填。
+	Records []*OriginRecord `json:"Records,omitnil,omitempty" name:"Records"`
+
 	// 源站组名称，可输入1 - 200个字符，允许的字符为 a - z, A - Z, 0 - 9, _, - 。
 	Name *string `json:"Name,omitnil,omitempty" name:"Name"`
 
@@ -3412,9 +3594,6 @@ type CreateOriginGroupRequest struct {
 	// <li>GENERAL：通用型源站组，仅支持添加 IP/域名 源站，可以被域名服务、规则引擎、四层代理、通用型负载均衡、HTTP 专用型负载均衡引用；</li>
 	// <li>HTTP： HTTP 专用型源站组，支持添加 IP/域名、对象存储源站作为源站，无法被四层代理引用，仅支持被添加加速域名、规则引擎-修改源站、HTTP 专用型负载均衡引用。</li>
 	Type *string `json:"Type,omitnil,omitempty" name:"Type"`
-
-	// 源站记录信息，此参数必填。
-	Records []*OriginRecord `json:"Records,omitnil,omitempty" name:"Records"`
 
 	// 回源 Host Header，仅 Type = HTTP 时传入生效，规则引擎修改 Host Header 配置优先级高于源站组的 Host Header。
 	HostHeader *string `json:"HostHeader,omitnil,omitempty" name:"HostHeader"`
@@ -3433,9 +3612,9 @@ func (r *CreateOriginGroupRequest) FromJsonString(s string) error {
 		return err
 	}
 	delete(f, "ZoneId")
+	delete(f, "Records")
 	delete(f, "Name")
 	delete(f, "Type")
-	delete(f, "Records")
 	delete(f, "HostHeader")
 	if len(f) > 0 {
 		return tcerr.NewTencentCloudSDKError("ClientError.BuildRequestError", "CreateOriginGroupRequest has unknown keys!", "")
@@ -3881,17 +4060,19 @@ type CreateRealtimeLogDeliveryTaskRequestParams struct {
 	// 实时日志投递任务类型，取值有：
 	// <li>cls: 推送到腾讯云 CLS；</li>
 	// <li>custom_endpoint：推送到自定义 HTTP(S) 地址；</li>
-	// <li>s3：推送到 AWS S3 兼容存储桶地址。</li>
+	// <li>s3：推送到 AWS S3 兼容存储桶地址；</li>
 	TaskType *string `json:"TaskType,omitnil,omitempty" name:"TaskType"`
 
-	// 实时日志投递任务对应的实体（七层域名或者四层代理实例）列表。取值示例如下：
-	// <li>七层域名：domain.example.com；</li>
-	// <li>四层代理实例：sid-2s69eb5wcms7。</li>
+	// 实时日志投递任务对应的实体列表。取值示例如下：
+	// <li>七层域名：domain.example.com</li>
+	// <li>四层代理实例：sid-2s69eb5wcms7</li>
+	// <li>边缘函数实例：test-zone-2mxigizoh9l9-1257626257</li>
 	EntityList []*string `json:"EntityList,omitnil,omitempty" name:"EntityList"`
 
 	// 数据投递类型，取值有：
 	// <li>domain：站点加速日志；</li>
 	// <li>application：四层代理日志；</li>
+	// <li>function：边缘函数运行日志；</li>
 	// <li>web-rateLiming：速率限制和 CC 攻击防护日志；</li>
 	// <li>web-attack：托管规则日志；</li>
 	// <li>web-rule：自定义规则日志；</li>
@@ -3903,7 +4084,10 @@ type CreateRealtimeLogDeliveryTaskRequestParams struct {
 	// <li>overseas：全球（不含中国大陆）。</li>
 	Area *string `json:"Area,omitnil,omitempty" name:"Area"`
 
-	// 投递的预设字段列表。
+	// 投递的预设字段列表。取值参考：
+	// <li>[站点加速日志（七层访问日志）](https://cloud.tencent.com/document/product/1552/105791)</li>
+	// <li>[四层代理日志](https://cloud.tencent.com/document/product/1552/105792)</li>
+	// <li>[边缘函数运行日志](https://cloud.tencent.com/document/product/1552/115585)</li>
 	Fields []*string `json:"Fields,omitnil,omitempty" name:"Fields"`
 
 	// 投递的自定义字段列表，支持在 HTTP 请求头、响应头、Cookie、请求正文中提取指定内容。自定义字段名称不能重复，且最多不能超过 200 个字段。单个实时日志推送任务最多添加 5 个请求正文类型的自定义字段。目前仅站点加速日志（LogType=domain）支持添加自定义字段。
@@ -3942,17 +4126,19 @@ type CreateRealtimeLogDeliveryTaskRequest struct {
 	// 实时日志投递任务类型，取值有：
 	// <li>cls: 推送到腾讯云 CLS；</li>
 	// <li>custom_endpoint：推送到自定义 HTTP(S) 地址；</li>
-	// <li>s3：推送到 AWS S3 兼容存储桶地址。</li>
+	// <li>s3：推送到 AWS S3 兼容存储桶地址；</li>
 	TaskType *string `json:"TaskType,omitnil,omitempty" name:"TaskType"`
 
-	// 实时日志投递任务对应的实体（七层域名或者四层代理实例）列表。取值示例如下：
-	// <li>七层域名：domain.example.com；</li>
-	// <li>四层代理实例：sid-2s69eb5wcms7。</li>
+	// 实时日志投递任务对应的实体列表。取值示例如下：
+	// <li>七层域名：domain.example.com</li>
+	// <li>四层代理实例：sid-2s69eb5wcms7</li>
+	// <li>边缘函数实例：test-zone-2mxigizoh9l9-1257626257</li>
 	EntityList []*string `json:"EntityList,omitnil,omitempty" name:"EntityList"`
 
 	// 数据投递类型，取值有：
 	// <li>domain：站点加速日志；</li>
 	// <li>application：四层代理日志；</li>
+	// <li>function：边缘函数运行日志；</li>
 	// <li>web-rateLiming：速率限制和 CC 攻击防护日志；</li>
 	// <li>web-attack：托管规则日志；</li>
 	// <li>web-rule：自定义规则日志；</li>
@@ -3964,7 +4150,10 @@ type CreateRealtimeLogDeliveryTaskRequest struct {
 	// <li>overseas：全球（不含中国大陆）。</li>
 	Area *string `json:"Area,omitnil,omitempty" name:"Area"`
 
-	// 投递的预设字段列表。
+	// 投递的预设字段列表。取值参考：
+	// <li>[站点加速日志（七层访问日志）](https://cloud.tencent.com/document/product/1552/105791)</li>
+	// <li>[四层代理日志](https://cloud.tencent.com/document/product/1552/105792)</li>
+	// <li>[边缘函数运行日志](https://cloud.tencent.com/document/product/1552/115585)</li>
 	Fields []*string `json:"Fields,omitnil,omitempty" name:"Fields"`
 
 	// 投递的自定义字段列表，支持在 HTTP 请求头、响应头、Cookie、请求正文中提取指定内容。自定义字段名称不能重复，且最多不能超过 200 个字段。单个实时日志推送任务最多添加 5 个请求正文类型的自定义字段。目前仅站点加速日志（LogType=domain）支持添加自定义字段。
@@ -4138,6 +4327,198 @@ func (r *CreateRuleResponse) FromJsonString(s string) error {
 }
 
 // Predefined struct for user
+type CreateSecurityAPIResourceRequestParams struct {
+	// 站点 ID。	
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	//  API 资源列表。
+	APIResources []*APIResource `json:"APIResources,omitnil,omitempty" name:"APIResources"`
+}
+
+type CreateSecurityAPIResourceRequest struct {
+	*tchttp.BaseRequest
+	
+	// 站点 ID。	
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	//  API 资源列表。
+	APIResources []*APIResource `json:"APIResources,omitnil,omitempty" name:"APIResources"`
+}
+
+func (r *CreateSecurityAPIResourceRequest) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *CreateSecurityAPIResourceRequest) FromJsonString(s string) error {
+	f := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(s), &f); err != nil {
+		return err
+	}
+	delete(f, "ZoneId")
+	delete(f, "APIResources")
+	if len(f) > 0 {
+		return tcerr.NewTencentCloudSDKError("ClientError.BuildRequestError", "CreateSecurityAPIResourceRequest has unknown keys!", "")
+	}
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type CreateSecurityAPIResourceResponseParams struct {
+	// API 资源 ID 列表。
+	APIResourceIds []*string `json:"APIResourceIds,omitnil,omitempty" name:"APIResourceIds"`
+
+	// 唯一请求 ID，由服务端生成，每次请求都会返回（若请求因其他原因未能抵达服务端，则该次请求不会获得 RequestId）。定位问题时需要提供该次请求的 RequestId。
+	RequestId *string `json:"RequestId,omitnil,omitempty" name:"RequestId"`
+}
+
+type CreateSecurityAPIResourceResponse struct {
+	*tchttp.BaseResponse
+	Response *CreateSecurityAPIResourceResponseParams `json:"Response"`
+}
+
+func (r *CreateSecurityAPIResourceResponse) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *CreateSecurityAPIResourceResponse) FromJsonString(s string) error {
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type CreateSecurityAPIServiceRequestParams struct {
+	// 站点 ID。	
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	//  API 服务列表。
+	APIServices []*APIService `json:"APIServices,omitnil,omitempty" name:"APIServices"`
+}
+
+type CreateSecurityAPIServiceRequest struct {
+	*tchttp.BaseRequest
+	
+	// 站点 ID。	
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	//  API 服务列表。
+	APIServices []*APIService `json:"APIServices,omitnil,omitempty" name:"APIServices"`
+}
+
+func (r *CreateSecurityAPIServiceRequest) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *CreateSecurityAPIServiceRequest) FromJsonString(s string) error {
+	f := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(s), &f); err != nil {
+		return err
+	}
+	delete(f, "ZoneId")
+	delete(f, "APIServices")
+	if len(f) > 0 {
+		return tcerr.NewTencentCloudSDKError("ClientError.BuildRequestError", "CreateSecurityAPIServiceRequest has unknown keys!", "")
+	}
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type CreateSecurityAPIServiceResponseParams struct {
+	// API 服务 ID 列表。
+	APIServiceIds []*string `json:"APIServiceIds,omitnil,omitempty" name:"APIServiceIds"`
+
+	// 唯一请求 ID，由服务端生成，每次请求都会返回（若请求因其他原因未能抵达服务端，则该次请求不会获得 RequestId）。定位问题时需要提供该次请求的 RequestId。
+	RequestId *string `json:"RequestId,omitnil,omitempty" name:"RequestId"`
+}
+
+type CreateSecurityAPIServiceResponse struct {
+	*tchttp.BaseResponse
+	Response *CreateSecurityAPIServiceResponseParams `json:"Response"`
+}
+
+func (r *CreateSecurityAPIServiceResponse) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *CreateSecurityAPIServiceResponse) FromJsonString(s string) error {
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type CreateSecurityClientAttesterRequestParams struct {
+	// 站点 ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 认证选项列表。
+	ClientAttesters []*ClientAttester `json:"ClientAttesters,omitnil,omitempty" name:"ClientAttesters"`
+}
+
+type CreateSecurityClientAttesterRequest struct {
+	*tchttp.BaseRequest
+	
+	// 站点 ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 认证选项列表。
+	ClientAttesters []*ClientAttester `json:"ClientAttesters,omitnil,omitempty" name:"ClientAttesters"`
+}
+
+func (r *CreateSecurityClientAttesterRequest) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *CreateSecurityClientAttesterRequest) FromJsonString(s string) error {
+	f := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(s), &f); err != nil {
+		return err
+	}
+	delete(f, "ZoneId")
+	delete(f, "ClientAttesters")
+	if len(f) > 0 {
+		return tcerr.NewTencentCloudSDKError("ClientError.BuildRequestError", "CreateSecurityClientAttesterRequest has unknown keys!", "")
+	}
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type CreateSecurityClientAttesterResponseParams struct {
+	// 认证选项 ID 列表。
+	ClientAttesterIds []*string `json:"ClientAttesterIds,omitnil,omitempty" name:"ClientAttesterIds"`
+
+	// 唯一请求 ID，由服务端生成，每次请求都会返回（若请求因其他原因未能抵达服务端，则该次请求不会获得 RequestId）。定位问题时需要提供该次请求的 RequestId。
+	RequestId *string `json:"RequestId,omitnil,omitempty" name:"RequestId"`
+}
+
+type CreateSecurityClientAttesterResponse struct {
+	*tchttp.BaseResponse
+	Response *CreateSecurityClientAttesterResponseParams `json:"Response"`
+}
+
+func (r *CreateSecurityClientAttesterResponse) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *CreateSecurityClientAttesterResponse) FromJsonString(s string) error {
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
 type CreateSecurityIPGroupRequestParams struct {
 	// 站点 Id。
 	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
@@ -4198,6 +4579,70 @@ func (r *CreateSecurityIPGroupResponse) ToJsonString() string {
 // FromJsonString It is highly **NOT** recommended to use this function
 // because it has no param check, nor strict type check
 func (r *CreateSecurityIPGroupResponse) FromJsonString(s string) error {
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type CreateSecurityJSInjectionRuleRequestParams struct {
+	// 站点 ID。	
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// JavaScript 注入规则列表。
+	JSInjectionRules []*JSInjectionRule `json:"JSInjectionRules,omitnil,omitempty" name:"JSInjectionRules"`
+}
+
+type CreateSecurityJSInjectionRuleRequest struct {
+	*tchttp.BaseRequest
+	
+	// 站点 ID。	
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// JavaScript 注入规则列表。
+	JSInjectionRules []*JSInjectionRule `json:"JSInjectionRules,omitnil,omitempty" name:"JSInjectionRules"`
+}
+
+func (r *CreateSecurityJSInjectionRuleRequest) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *CreateSecurityJSInjectionRuleRequest) FromJsonString(s string) error {
+	f := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(s), &f); err != nil {
+		return err
+	}
+	delete(f, "ZoneId")
+	delete(f, "JSInjectionRules")
+	if len(f) > 0 {
+		return tcerr.NewTencentCloudSDKError("ClientError.BuildRequestError", "CreateSecurityJSInjectionRuleRequest has unknown keys!", "")
+	}
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type CreateSecurityJSInjectionRuleResponseParams struct {
+	// JavaScript 注入规则 ID 列表。
+	JSInjectionRuleIds []*string `json:"JSInjectionRuleIds,omitnil,omitempty" name:"JSInjectionRuleIds"`
+
+	// 唯一请求 ID，由服务端生成，每次请求都会返回（若请求因其他原因未能抵达服务端，则该次请求不会获得 RequestId）。定位问题时需要提供该次请求的 RequestId。
+	RequestId *string `json:"RequestId,omitnil,omitempty" name:"RequestId"`
+}
+
+type CreateSecurityJSInjectionRuleResponse struct {
+	*tchttp.BaseResponse
+	Response *CreateSecurityJSInjectionRuleResponseParams `json:"Response"`
+}
+
+func (r *CreateSecurityJSInjectionRuleResponse) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *CreateSecurityJSInjectionRuleResponse) FromJsonString(s string) error {
 	return json.Unmarshal([]byte(s), &r)
 }
 
@@ -5320,6 +5765,67 @@ func (r *DeleteFunctionRulesResponse) FromJsonString(s string) error {
 }
 
 // Predefined struct for user
+type DeleteJustInTimeTranscodeTemplatesRequestParams struct {
+	// 站点ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 需删除的即时转码模板唯一标识数组，长度限制：100。
+	TemplateIds []*string `json:"TemplateIds,omitnil,omitempty" name:"TemplateIds"`
+}
+
+type DeleteJustInTimeTranscodeTemplatesRequest struct {
+	*tchttp.BaseRequest
+	
+	// 站点ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 需删除的即时转码模板唯一标识数组，长度限制：100。
+	TemplateIds []*string `json:"TemplateIds,omitnil,omitempty" name:"TemplateIds"`
+}
+
+func (r *DeleteJustInTimeTranscodeTemplatesRequest) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *DeleteJustInTimeTranscodeTemplatesRequest) FromJsonString(s string) error {
+	f := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(s), &f); err != nil {
+		return err
+	}
+	delete(f, "ZoneId")
+	delete(f, "TemplateIds")
+	if len(f) > 0 {
+		return tcerr.NewTencentCloudSDKError("ClientError.BuildRequestError", "DeleteJustInTimeTranscodeTemplatesRequest has unknown keys!", "")
+	}
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type DeleteJustInTimeTranscodeTemplatesResponseParams struct {
+	// 唯一请求 ID，由服务端生成，每次请求都会返回（若请求因其他原因未能抵达服务端，则该次请求不会获得 RequestId）。定位问题时需要提供该次请求的 RequestId。
+	RequestId *string `json:"RequestId,omitnil,omitempty" name:"RequestId"`
+}
+
+type DeleteJustInTimeTranscodeTemplatesResponse struct {
+	*tchttp.BaseResponse
+	Response *DeleteJustInTimeTranscodeTemplatesResponseParams `json:"Response"`
+}
+
+func (r *DeleteJustInTimeTranscodeTemplatesResponse) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *DeleteJustInTimeTranscodeTemplatesResponse) FromJsonString(s string) error {
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
 type DeleteL4ProxyRequestParams struct {
 	// 站点 ID。
 	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
@@ -5883,6 +6389,189 @@ func (r *DeleteRulesResponse) FromJsonString(s string) error {
 }
 
 // Predefined struct for user
+type DeleteSecurityAPIResourceRequestParams struct {
+	// 站点 ID。	
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 需要删除的 API 资源 ID 列表。
+	APIResourceIds []*string `json:"APIResourceIds,omitnil,omitempty" name:"APIResourceIds"`
+}
+
+type DeleteSecurityAPIResourceRequest struct {
+	*tchttp.BaseRequest
+	
+	// 站点 ID。	
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 需要删除的 API 资源 ID 列表。
+	APIResourceIds []*string `json:"APIResourceIds,omitnil,omitempty" name:"APIResourceIds"`
+}
+
+func (r *DeleteSecurityAPIResourceRequest) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *DeleteSecurityAPIResourceRequest) FromJsonString(s string) error {
+	f := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(s), &f); err != nil {
+		return err
+	}
+	delete(f, "ZoneId")
+	delete(f, "APIResourceIds")
+	if len(f) > 0 {
+		return tcerr.NewTencentCloudSDKError("ClientError.BuildRequestError", "DeleteSecurityAPIResourceRequest has unknown keys!", "")
+	}
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type DeleteSecurityAPIResourceResponseParams struct {
+	// 唯一请求 ID，由服务端生成，每次请求都会返回（若请求因其他原因未能抵达服务端，则该次请求不会获得 RequestId）。定位问题时需要提供该次请求的 RequestId。
+	RequestId *string `json:"RequestId,omitnil,omitempty" name:"RequestId"`
+}
+
+type DeleteSecurityAPIResourceResponse struct {
+	*tchttp.BaseResponse
+	Response *DeleteSecurityAPIResourceResponseParams `json:"Response"`
+}
+
+func (r *DeleteSecurityAPIResourceResponse) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *DeleteSecurityAPIResourceResponse) FromJsonString(s string) error {
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type DeleteSecurityAPIServiceRequestParams struct {
+	// 站点 ID。	
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// API 服务 ID 列表。
+	APIServiceIds []*string `json:"APIServiceIds,omitnil,omitempty" name:"APIServiceIds"`
+}
+
+type DeleteSecurityAPIServiceRequest struct {
+	*tchttp.BaseRequest
+	
+	// 站点 ID。	
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// API 服务 ID 列表。
+	APIServiceIds []*string `json:"APIServiceIds,omitnil,omitempty" name:"APIServiceIds"`
+}
+
+func (r *DeleteSecurityAPIServiceRequest) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *DeleteSecurityAPIServiceRequest) FromJsonString(s string) error {
+	f := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(s), &f); err != nil {
+		return err
+	}
+	delete(f, "ZoneId")
+	delete(f, "APIServiceIds")
+	if len(f) > 0 {
+		return tcerr.NewTencentCloudSDKError("ClientError.BuildRequestError", "DeleteSecurityAPIServiceRequest has unknown keys!", "")
+	}
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type DeleteSecurityAPIServiceResponseParams struct {
+	// 唯一请求 ID，由服务端生成，每次请求都会返回（若请求因其他原因未能抵达服务端，则该次请求不会获得 RequestId）。定位问题时需要提供该次请求的 RequestId。
+	RequestId *string `json:"RequestId,omitnil,omitempty" name:"RequestId"`
+}
+
+type DeleteSecurityAPIServiceResponse struct {
+	*tchttp.BaseResponse
+	Response *DeleteSecurityAPIServiceResponseParams `json:"Response"`
+}
+
+func (r *DeleteSecurityAPIServiceResponse) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *DeleteSecurityAPIServiceResponse) FromJsonString(s string) error {
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type DeleteSecurityClientAttesterRequestParams struct {
+	// 站点 ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 客户端认证选项 ID。
+	ClientAttesterIds []*string `json:"ClientAttesterIds,omitnil,omitempty" name:"ClientAttesterIds"`
+}
+
+type DeleteSecurityClientAttesterRequest struct {
+	*tchttp.BaseRequest
+	
+	// 站点 ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 客户端认证选项 ID。
+	ClientAttesterIds []*string `json:"ClientAttesterIds,omitnil,omitempty" name:"ClientAttesterIds"`
+}
+
+func (r *DeleteSecurityClientAttesterRequest) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *DeleteSecurityClientAttesterRequest) FromJsonString(s string) error {
+	f := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(s), &f); err != nil {
+		return err
+	}
+	delete(f, "ZoneId")
+	delete(f, "ClientAttesterIds")
+	if len(f) > 0 {
+		return tcerr.NewTencentCloudSDKError("ClientError.BuildRequestError", "DeleteSecurityClientAttesterRequest has unknown keys!", "")
+	}
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type DeleteSecurityClientAttesterResponseParams struct {
+	// 唯一请求 ID，由服务端生成，每次请求都会返回（若请求因其他原因未能抵达服务端，则该次请求不会获得 RequestId）。定位问题时需要提供该次请求的 RequestId。
+	RequestId *string `json:"RequestId,omitnil,omitempty" name:"RequestId"`
+}
+
+type DeleteSecurityClientAttesterResponse struct {
+	*tchttp.BaseResponse
+	Response *DeleteSecurityClientAttesterResponseParams `json:"Response"`
+}
+
+func (r *DeleteSecurityClientAttesterResponse) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *DeleteSecurityClientAttesterResponse) FromJsonString(s string) error {
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
 type DeleteSecurityIPGroupRequestParams struct {
 	// 站点 Id。
 	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
@@ -5940,6 +6629,67 @@ func (r *DeleteSecurityIPGroupResponse) ToJsonString() string {
 // FromJsonString It is highly **NOT** recommended to use this function
 // because it has no param check, nor strict type check
 func (r *DeleteSecurityIPGroupResponse) FromJsonString(s string) error {
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type DeleteSecurityJSInjectionRuleRequestParams struct {
+	// 站点 ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// JavaScript 注入规则 ID 列表。
+	JSInjectionRuleIds []*string `json:"JSInjectionRuleIds,omitnil,omitempty" name:"JSInjectionRuleIds"`
+}
+
+type DeleteSecurityJSInjectionRuleRequest struct {
+	*tchttp.BaseRequest
+	
+	// 站点 ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// JavaScript 注入规则 ID 列表。
+	JSInjectionRuleIds []*string `json:"JSInjectionRuleIds,omitnil,omitempty" name:"JSInjectionRuleIds"`
+}
+
+func (r *DeleteSecurityJSInjectionRuleRequest) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *DeleteSecurityJSInjectionRuleRequest) FromJsonString(s string) error {
+	f := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(s), &f); err != nil {
+		return err
+	}
+	delete(f, "ZoneId")
+	delete(f, "JSInjectionRuleIds")
+	if len(f) > 0 {
+		return tcerr.NewTencentCloudSDKError("ClientError.BuildRequestError", "DeleteSecurityJSInjectionRuleRequest has unknown keys!", "")
+	}
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type DeleteSecurityJSInjectionRuleResponseParams struct {
+	// 唯一请求 ID，由服务端生成，每次请求都会返回（若请求因其他原因未能抵达服务端，则该次请求不会获得 RequestId）。定位问题时需要提供该次请求的 RequestId。
+	RequestId *string `json:"RequestId,omitnil,omitempty" name:"RequestId"`
+}
+
+type DeleteSecurityJSInjectionRuleResponse struct {
+	*tchttp.BaseResponse
+	Response *DeleteSecurityJSInjectionRuleResponseParams `json:"Response"`
+}
+
+func (r *DeleteSecurityJSInjectionRuleResponse) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *DeleteSecurityJSInjectionRuleResponse) FromJsonString(s string) error {
 	return json.Unmarshal([]byte(s), &r)
 }
 
@@ -8344,6 +9094,101 @@ func (r *DescribeIdentificationsResponse) FromJsonString(s string) error {
 }
 
 // Predefined struct for user
+type DescribeJustInTimeTranscodeTemplatesRequestParams struct {
+	// 站点ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 过滤条件，Filters 的上限为 20，Filters.Values 的上限为 20。该参数不填写时，默认返回当前 ZoneId 下有权限的即时转码模板。详细的过滤条件如下：<li>template-name：按照模版名批量进行过滤。例如：mytemplate；</li><li>template-type：按照模板类型批量进行过滤。例如：preset 或 custom。</li><li>template-id：按照模板 ID 批量进行过滤。例如：C1LZ7982VgTpYhJ7M。</li>默认为空。
+	Filters []*Filter `json:"Filters,omitnil,omitempty" name:"Filters"`
+
+	// 排序字段，取值有：<li>createTime：模板创建时间。</li>默认值为：createTime。
+	SortBy *string `json:"SortBy,omitnil,omitempty" name:"SortBy"`
+
+	// 排序方式，取值有：<li>asc：升序方式；</li><li>desc：降序方式。</li>默认值为：desc。
+	SortOrder *string `json:"SortOrder,omitnil,omitempty" name:"SortOrder"`
+
+	// 分页偏移量，默认值：0。
+	Offset *int64 `json:"Offset,omitnil,omitempty" name:"Offset"`
+
+	// 返回记录条数，默认值：20，最大值：1000。
+	Limit *int64 `json:"Limit,omitnil,omitempty" name:"Limit"`
+}
+
+type DescribeJustInTimeTranscodeTemplatesRequest struct {
+	*tchttp.BaseRequest
+	
+	// 站点ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 过滤条件，Filters 的上限为 20，Filters.Values 的上限为 20。该参数不填写时，默认返回当前 ZoneId 下有权限的即时转码模板。详细的过滤条件如下：<li>template-name：按照模版名批量进行过滤。例如：mytemplate；</li><li>template-type：按照模板类型批量进行过滤。例如：preset 或 custom。</li><li>template-id：按照模板 ID 批量进行过滤。例如：C1LZ7982VgTpYhJ7M。</li>默认为空。
+	Filters []*Filter `json:"Filters,omitnil,omitempty" name:"Filters"`
+
+	// 排序字段，取值有：<li>createTime：模板创建时间。</li>默认值为：createTime。
+	SortBy *string `json:"SortBy,omitnil,omitempty" name:"SortBy"`
+
+	// 排序方式，取值有：<li>asc：升序方式；</li><li>desc：降序方式。</li>默认值为：desc。
+	SortOrder *string `json:"SortOrder,omitnil,omitempty" name:"SortOrder"`
+
+	// 分页偏移量，默认值：0。
+	Offset *int64 `json:"Offset,omitnil,omitempty" name:"Offset"`
+
+	// 返回记录条数，默认值：20，最大值：1000。
+	Limit *int64 `json:"Limit,omitnil,omitempty" name:"Limit"`
+}
+
+func (r *DescribeJustInTimeTranscodeTemplatesRequest) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *DescribeJustInTimeTranscodeTemplatesRequest) FromJsonString(s string) error {
+	f := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(s), &f); err != nil {
+		return err
+	}
+	delete(f, "ZoneId")
+	delete(f, "Filters")
+	delete(f, "SortBy")
+	delete(f, "SortOrder")
+	delete(f, "Offset")
+	delete(f, "Limit")
+	if len(f) > 0 {
+		return tcerr.NewTencentCloudSDKError("ClientError.BuildRequestError", "DescribeJustInTimeTranscodeTemplatesRequest has unknown keys!", "")
+	}
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type DescribeJustInTimeTranscodeTemplatesResponseParams struct {
+	// 符合过滤条件的记录总数。
+	TotalCount *uint64 `json:"TotalCount,omitnil,omitempty" name:"TotalCount"`
+
+	// 模板详情列表。
+	TemplateSet []*JustInTimeTranscodeTemplate `json:"TemplateSet,omitnil,omitempty" name:"TemplateSet"`
+
+	// 唯一请求 ID，由服务端生成，每次请求都会返回（若请求因其他原因未能抵达服务端，则该次请求不会获得 RequestId）。定位问题时需要提供该次请求的 RequestId。
+	RequestId *string `json:"RequestId,omitnil,omitempty" name:"RequestId"`
+}
+
+type DescribeJustInTimeTranscodeTemplatesResponse struct {
+	*tchttp.BaseResponse
+	Response *DescribeJustInTimeTranscodeTemplatesResponseParams `json:"Response"`
+}
+
+func (r *DescribeJustInTimeTranscodeTemplatesResponse) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *DescribeJustInTimeTranscodeTemplatesResponse) FromJsonString(s string) error {
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
 type DescribeL4ProxyRequestParams struct {
 	// 四层代理实例所属站点的 ID。
 	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
@@ -10045,6 +10890,309 @@ func (r *DescribeRulesSettingResponse) FromJsonString(s string) error {
 }
 
 // Predefined struct for user
+type DescribeSecurityAPIResourceRequestParams struct {
+	// 站点 ID。	
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 分页查询限制数目。默认值：20，最大值：100。
+	Limit *int64 `json:"Limit,omitnil,omitempty" name:"Limit"`
+
+	// 分页查询偏移量。默认值：0。
+	Offset *int64 `json:"Offset,omitnil,omitempty" name:"Offset"`
+}
+
+type DescribeSecurityAPIResourceRequest struct {
+	*tchttp.BaseRequest
+	
+	// 站点 ID。	
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 分页查询限制数目。默认值：20，最大值：100。
+	Limit *int64 `json:"Limit,omitnil,omitempty" name:"Limit"`
+
+	// 分页查询偏移量。默认值：0。
+	Offset *int64 `json:"Offset,omitnil,omitempty" name:"Offset"`
+}
+
+func (r *DescribeSecurityAPIResourceRequest) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *DescribeSecurityAPIResourceRequest) FromJsonString(s string) error {
+	f := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(s), &f); err != nil {
+		return err
+	}
+	delete(f, "ZoneId")
+	delete(f, "Limit")
+	delete(f, "Offset")
+	if len(f) > 0 {
+		return tcerr.NewTencentCloudSDKError("ClientError.BuildRequestError", "DescribeSecurityAPIResourceRequest has unknown keys!", "")
+	}
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type DescribeSecurityAPIResourceResponseParams struct {
+	// API 资源总数量。
+	TotalCount *int64 `json:"TotalCount,omitnil,omitempty" name:"TotalCount"`
+
+	// API 资源列表。	
+	APIResources []*APIResource `json:"APIResources,omitnil,omitempty" name:"APIResources"`
+
+	// 唯一请求 ID，由服务端生成，每次请求都会返回（若请求因其他原因未能抵达服务端，则该次请求不会获得 RequestId）。定位问题时需要提供该次请求的 RequestId。
+	RequestId *string `json:"RequestId,omitnil,omitempty" name:"RequestId"`
+}
+
+type DescribeSecurityAPIResourceResponse struct {
+	*tchttp.BaseResponse
+	Response *DescribeSecurityAPIResourceResponseParams `json:"Response"`
+}
+
+func (r *DescribeSecurityAPIResourceResponse) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *DescribeSecurityAPIResourceResponse) FromJsonString(s string) error {
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type DescribeSecurityAPIServiceRequestParams struct {
+	// 站点 ID。	
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 分页查询限制数目。默认值：20，最大值：100。
+	Limit *int64 `json:"Limit,omitnil,omitempty" name:"Limit"`
+
+	// 分页查询偏移量。默认值：0。
+	Offset *int64 `json:"Offset,omitnil,omitempty" name:"Offset"`
+}
+
+type DescribeSecurityAPIServiceRequest struct {
+	*tchttp.BaseRequest
+	
+	// 站点 ID。	
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 分页查询限制数目。默认值：20，最大值：100。
+	Limit *int64 `json:"Limit,omitnil,omitempty" name:"Limit"`
+
+	// 分页查询偏移量。默认值：0。
+	Offset *int64 `json:"Offset,omitnil,omitempty" name:"Offset"`
+}
+
+func (r *DescribeSecurityAPIServiceRequest) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *DescribeSecurityAPIServiceRequest) FromJsonString(s string) error {
+	f := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(s), &f); err != nil {
+		return err
+	}
+	delete(f, "ZoneId")
+	delete(f, "Limit")
+	delete(f, "Offset")
+	if len(f) > 0 {
+		return tcerr.NewTencentCloudSDKError("ClientError.BuildRequestError", "DescribeSecurityAPIServiceRequest has unknown keys!", "")
+	}
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type DescribeSecurityAPIServiceResponseParams struct {
+	// API 服务总数量。	
+	TotalCount *int64 `json:"TotalCount,omitnil,omitempty" name:"TotalCount"`
+
+	// API 服务列表。	
+	APIServices []*APIService `json:"APIServices,omitnil,omitempty" name:"APIServices"`
+
+	// 唯一请求 ID，由服务端生成，每次请求都会返回（若请求因其他原因未能抵达服务端，则该次请求不会获得 RequestId）。定位问题时需要提供该次请求的 RequestId。
+	RequestId *string `json:"RequestId,omitnil,omitempty" name:"RequestId"`
+}
+
+type DescribeSecurityAPIServiceResponse struct {
+	*tchttp.BaseResponse
+	Response *DescribeSecurityAPIServiceResponseParams `json:"Response"`
+}
+
+func (r *DescribeSecurityAPIServiceResponse) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *DescribeSecurityAPIServiceResponse) FromJsonString(s string) error {
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type DescribeSecurityClientAttesterRequestParams struct {
+	// 站点 ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 分页查询限制数目。默认值：20，最大值：100。
+	Limit *int64 `json:"Limit,omitnil,omitempty" name:"Limit"`
+
+	// 分页查询偏移量。默认值：0。
+	Offset *int64 `json:"Offset,omitnil,omitempty" name:"Offset"`
+}
+
+type DescribeSecurityClientAttesterRequest struct {
+	*tchttp.BaseRequest
+	
+	// 站点 ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 分页查询限制数目。默认值：20，最大值：100。
+	Limit *int64 `json:"Limit,omitnil,omitempty" name:"Limit"`
+
+	// 分页查询偏移量。默认值：0。
+	Offset *int64 `json:"Offset,omitnil,omitempty" name:"Offset"`
+}
+
+func (r *DescribeSecurityClientAttesterRequest) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *DescribeSecurityClientAttesterRequest) FromJsonString(s string) error {
+	f := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(s), &f); err != nil {
+		return err
+	}
+	delete(f, "ZoneId")
+	delete(f, "Limit")
+	delete(f, "Offset")
+	if len(f) > 0 {
+		return tcerr.NewTencentCloudSDKError("ClientError.BuildRequestError", "DescribeSecurityClientAttesterRequest has unknown keys!", "")
+	}
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type DescribeSecurityClientAttesterResponseParams struct {
+	// 认证选项总数量。
+	TotalCount *int64 `json:"TotalCount,omitnil,omitempty" name:"TotalCount"`
+
+	// 认证选项列表。
+	ClientAttesters []*ClientAttester `json:"ClientAttesters,omitnil,omitempty" name:"ClientAttesters"`
+
+	// 唯一请求 ID，由服务端生成，每次请求都会返回（若请求因其他原因未能抵达服务端，则该次请求不会获得 RequestId）。定位问题时需要提供该次请求的 RequestId。
+	RequestId *string `json:"RequestId,omitnil,omitempty" name:"RequestId"`
+}
+
+type DescribeSecurityClientAttesterResponse struct {
+	*tchttp.BaseResponse
+	Response *DescribeSecurityClientAttesterResponseParams `json:"Response"`
+}
+
+func (r *DescribeSecurityClientAttesterResponse) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *DescribeSecurityClientAttesterResponse) FromJsonString(s string) error {
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type DescribeSecurityIPGroupContentRequestParams struct {
+	// 站点 ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// IP 组 ID。
+	GroupId *int64 `json:"GroupId,omitnil,omitempty" name:"GroupId"`
+
+	// 分页查询限制数目。默认值：2000，最大值：100000。
+	Limit *int64 `json:"Limit,omitnil,omitempty" name:"Limit"`
+
+	// 分页查询偏移量。默认值：0。
+	Offset *int64 `json:"Offset,omitnil,omitempty" name:"Offset"`
+}
+
+type DescribeSecurityIPGroupContentRequest struct {
+	*tchttp.BaseRequest
+	
+	// 站点 ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// IP 组 ID。
+	GroupId *int64 `json:"GroupId,omitnil,omitempty" name:"GroupId"`
+
+	// 分页查询限制数目。默认值：2000，最大值：100000。
+	Limit *int64 `json:"Limit,omitnil,omitempty" name:"Limit"`
+
+	// 分页查询偏移量。默认值：0。
+	Offset *int64 `json:"Offset,omitnil,omitempty" name:"Offset"`
+}
+
+func (r *DescribeSecurityIPGroupContentRequest) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *DescribeSecurityIPGroupContentRequest) FromJsonString(s string) error {
+	f := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(s), &f); err != nil {
+		return err
+	}
+	delete(f, "ZoneId")
+	delete(f, "GroupId")
+	delete(f, "Limit")
+	delete(f, "Offset")
+	if len(f) > 0 {
+		return tcerr.NewTencentCloudSDKError("ClientError.BuildRequestError", "DescribeSecurityIPGroupContentRequest has unknown keys!", "")
+	}
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type DescribeSecurityIPGroupContentResponseParams struct {
+	// IP 组中正在生效的 IP 或网段个数。
+	IPTotalCount *int64 `json:"IPTotalCount,omitnil,omitempty" name:"IPTotalCount"`
+
+	// 满足查询条件的 IP 或网段列表。受 Limit 和 Offset 参数限制。
+	IPList []*string `json:"IPList,omitnil,omitempty" name:"IPList"`
+
+	// 唯一请求 ID，由服务端生成，每次请求都会返回（若请求因其他原因未能抵达服务端，则该次请求不会获得 RequestId）。定位问题时需要提供该次请求的 RequestId。
+	RequestId *string `json:"RequestId,omitnil,omitempty" name:"RequestId"`
+}
+
+type DescribeSecurityIPGroupContentResponse struct {
+	*tchttp.BaseResponse
+	Response *DescribeSecurityIPGroupContentResponseParams `json:"Response"`
+}
+
+func (r *DescribeSecurityIPGroupContentResponse) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *DescribeSecurityIPGroupContentResponse) FromJsonString(s string) error {
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
 type DescribeSecurityIPGroupInfoRequestParams struct {
 	// 站点的 ID ，用于指定查询的站点范围。
 	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
@@ -10179,6 +11327,80 @@ func (r *DescribeSecurityIPGroupResponse) ToJsonString() string {
 // FromJsonString It is highly **NOT** recommended to use this function
 // because it has no param check, nor strict type check
 func (r *DescribeSecurityIPGroupResponse) FromJsonString(s string) error {
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type DescribeSecurityJSInjectionRuleRequestParams struct {
+	// 站点 ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 分页查询限制数目。默认值：20，最大值：100。
+	Limit *int64 `json:"Limit,omitnil,omitempty" name:"Limit"`
+
+	// 分页查询偏移量。默认值：0。
+	Offset *int64 `json:"Offset,omitnil,omitempty" name:"Offset"`
+}
+
+type DescribeSecurityJSInjectionRuleRequest struct {
+	*tchttp.BaseRequest
+	
+	// 站点 ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 分页查询限制数目。默认值：20，最大值：100。
+	Limit *int64 `json:"Limit,omitnil,omitempty" name:"Limit"`
+
+	// 分页查询偏移量。默认值：0。
+	Offset *int64 `json:"Offset,omitnil,omitempty" name:"Offset"`
+}
+
+func (r *DescribeSecurityJSInjectionRuleRequest) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *DescribeSecurityJSInjectionRuleRequest) FromJsonString(s string) error {
+	f := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(s), &f); err != nil {
+		return err
+	}
+	delete(f, "ZoneId")
+	delete(f, "Limit")
+	delete(f, "Offset")
+	if len(f) > 0 {
+		return tcerr.NewTencentCloudSDKError("ClientError.BuildRequestError", "DescribeSecurityJSInjectionRuleRequest has unknown keys!", "")
+	}
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type DescribeSecurityJSInjectionRuleResponseParams struct {
+	// JavaScript 注入规则总数量。
+	TotalCount *int64 `json:"TotalCount,omitnil,omitempty" name:"TotalCount"`
+
+	// JavaScript 注入规则列表。
+	JSInjectionRules []*JSInjectionRule `json:"JSInjectionRules,omitnil,omitempty" name:"JSInjectionRules"`
+
+	// 唯一请求 ID，由服务端生成，每次请求都会返回（若请求因其他原因未能抵达服务端，则该次请求不会获得 RequestId）。定位问题时需要提供该次请求的 RequestId。
+	RequestId *string `json:"RequestId,omitnil,omitempty" name:"RequestId"`
+}
+
+type DescribeSecurityJSInjectionRuleResponse struct {
+	*tchttp.BaseResponse
+	Response *DescribeSecurityJSInjectionRuleResponseParams `json:"Response"`
+}
+
+func (r *DescribeSecurityJSInjectionRuleResponse) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *DescribeSecurityJSInjectionRuleResponse) FromJsonString(s string) error {
 	return json.Unmarshal([]byte(s), &r)
 }
 
@@ -10495,28 +11717,11 @@ type DescribeTimingL7AnalysisDataRequestParams struct {
 	// <li>day: 1天。</li>不填将根据开始时间跟结束时间的间距自动推算粒度，具体为：2 小时范围内以 min 粒度查询，2 天范围内以 5min 粒度查询，7 天范围内以 hour 粒度查询，超过 7 天以 day 粒度查询。
 	Interval *string `json:"Interval,omitnil,omitempty" name:"Interval"`
 
-	// 过滤条件，详细的过滤条件 Key 值如下：
-	// <li>country：按照国家/地区进行过滤，国家/地区遵循 <a href="https://baike.baidu.com/item/ISO%203166-1/5269555">ISO 3166-1 alpha-2</a> 规范。示例值：CN。</li>
-	// <li>province：按照省份进行过滤，此参数只支持服务区域为中国大陆。省份代码参考<a href="https://cloud.tencent.com/document/product/228/6316#.E5.8C.BA.E5.9F.9F-.2F-.E8.BF.90.E8.90.A5.E5.95.86.E6.98.A0.E5.B0.84.E8.A1.A8">境内省份映射表</a>，示例值：22。</li>
-	// <li>isp：按照运营商进行过滤，此参数只支持服务区域为中国大陆。对应的 Value 可选项如下：<br>   2：中国电信；<br>   26：中国联通；<br>   1046：中国移动；<br>   3947：中国铁通；<br>   38：教育网；<br>   43：长城宽带；<br>   0：其他运营商。</li>
-	// <li>domain：按照子域名进行过滤，示例值： www.example.com。</li>
-	// <li>url：按照 URL Path 进行过滤，示例值：/content 或 /content/test.jpg。若填写 url 参数，则最多可查询近 30 天的数据。</li>
-	// <li>referer：按照 Referer 请求头部进行过滤，示例值：http://www.example.com/。若填写 referer 参数，则最多可查询近 30 天的数据；</li>
-	// <li>resourceType：按照资源类型进行过滤，资源类型一般是文件后缀，示例值：.jpg。若填写 resourceType 参数，则最多可查询近 30 天的数据；</li>
-	// <li>protocol：按照 HTTP 协议版本进行过滤。对应的 Value 可选项如下：<br>   HTTP/1.0；<br>   HTTP/1.1；<br>   HTTP/2.0；<br>   HTTP/3；<br>   WebSocket。</li>
-	// <li>socket：按照 HTTP协议类型进行过滤。对应的 Value 可选项如下：<br>   HTTP：HTTP 协议；<br>   HTTPS：HTTPS 协议；<br>   QUIC：QUIC 协议。</li>
-	// <li>statusCode：按照边缘状态码进行过滤。若填写 statusCode 参数，则最多可查询近 30 天的数据。对应的 Value 可选项如下：<br>   1XX：1xx类型的状态码；<br>   2XX：2xx类型的状态码；<br>   3XX：3xx类型的状态码；<br>   4XX：4xx类型的状态码；<br>   5XX：5xx类型的状态码；<br>   在 [0,600) 范围内的整数。</li>
-	// <li>browserType：按照浏览器类型进行过滤。若填写 browserType 参数，则最多可查询近 30 天的数据。对应 Value 的可选项如下：<br>   Firefox：Firefox浏览器；<br>   Chrome：Chrome浏览器；<br>   Safari：Safari浏览器；<br>   Other：其他浏览器类型；<br>   Empty：浏览器类型为空；<br>   Bot：搜索引擎爬虫；<br>   MicrosoftEdge：MicrosoftEdge浏览器；<br>   IE：IE浏览器；<br>   Opera：Opera浏览器；<br>   QQBrowser：QQ浏览器；<br>   LBBrowser：LB浏览器；<br>   MaxthonBrowser：Maxthon浏览器；<br>   SouGouBrowser：搜狗浏览器；<br>   BIDUBrowser：百度浏览器；<br>   TaoBrowser：淘浏览器；<br>   UBrowser：UC浏览器。</li>
-	// <li>deviceType：按照设备类型进行过滤。若填写 deviceType 参数，则最多可查询近 30 天的数据。对应 Value 的可选项如下：<br>   TV：TV设备；<br>   Tablet：Tablet设备；<br>   Mobile：Mobile设备；<br>   Desktop：Desktop设备；<br>   Other：其他设备类型；<br>   Empty：设备类型为空。</li>
-	// <li>operatingSystemType：按照操作系统类型进行过滤。若填写 operatingSystemType 参数，则最多可查询近 30 天的数据。对应 Value 的可选项如下：<br>   Linux：Linux操作系统；<br>   MacOS：MacOs操作系统；<br>   Android：Android操作系统；<br>   IOS：IOS操作系统；<br>   Windows：Windows操作系统；<br>   NetBSD：NetBSD；<br>   ChromiumOS：ChromiumOS；<br>   Bot：搜索引擎爬虫；<br>   Other：其他类型的操作系统；<br>   Empty：操作系统为空。</li>
-	// <li>tlsVersion：按照 TLS 版本进行过滤。若填写 tlsVersion 参数，则最多可查询近 30 天的数据。对应 Value 的可选项如下：<br>   TLS1.0；<br>   TLS1.1；<br>   TLS1.2；<br>   TLS1.3。</li>
-	// <li>ipVersion：按照 IP 版本进行过滤。对应 Value 的可选项如下：<br>   4：IPv4；<br>   6：IPv6。</li>
-	// <li>cacheType：按照缓存状态进行过滤。对应 Value 的可选项如下：<br>   hit：请求命中 EdgeOne 节点缓存，资源由节点缓存提供。资源部分命中缓存也会记录为 hit。<br>   miss：请求未命中 EdgeOne 节点缓存，资源由源站提供。<br>   dynamic：请求的资源无法缓存/未配置被节点缓存，资源由源站提供。<br>   other：无法被识别的缓存状态。边缘函数响应的请求会记录为 other。</li>
-	// <li>clientIp：按照客户端 IP 进行过滤。若填写 clientIp 参数，则最多可查询近 30 天的数据。</li>
-	// <li>userAgent：按照 User-Agent 请求头部进行过滤。若填写 userAgent 参数，则最多可查询近 30 天的数据。</li>
+	// 筛选数据时使用的过滤条件，取值参考 [指标分析筛选条件说明](https://cloud.tencent.com/document/product/1552/98219#1aaf1150-55a4-4b4d-b103-3a8317ac7945) 中针对 L7 访问流量、带宽、请求数的可用筛选项。
+	// 如需限定站点或内容标识符，请在 `ZoneIds.N` 参数中另行传入对应的值。
 	Filters []*QueryCondition `json:"Filters,omitnil,omitempty" name:"Filters"`
 
-	// 数据归属地区。该参数已废弃。请在 Filters.country 中按客户端地域过滤数据。
+	// 数据归属地区。该参数已废弃。请在 `Filters.country` 中按客户端地域过滤数据。
 	Area *string `json:"Area,omitnil,omitempty" name:"Area"`
 }
 
@@ -10551,28 +11756,11 @@ type DescribeTimingL7AnalysisDataRequest struct {
 	// <li>day: 1天。</li>不填将根据开始时间跟结束时间的间距自动推算粒度，具体为：2 小时范围内以 min 粒度查询，2 天范围内以 5min 粒度查询，7 天范围内以 hour 粒度查询，超过 7 天以 day 粒度查询。
 	Interval *string `json:"Interval,omitnil,omitempty" name:"Interval"`
 
-	// 过滤条件，详细的过滤条件 Key 值如下：
-	// <li>country：按照国家/地区进行过滤，国家/地区遵循 <a href="https://baike.baidu.com/item/ISO%203166-1/5269555">ISO 3166-1 alpha-2</a> 规范。示例值：CN。</li>
-	// <li>province：按照省份进行过滤，此参数只支持服务区域为中国大陆。省份代码参考<a href="https://cloud.tencent.com/document/product/228/6316#.E5.8C.BA.E5.9F.9F-.2F-.E8.BF.90.E8.90.A5.E5.95.86.E6.98.A0.E5.B0.84.E8.A1.A8">境内省份映射表</a>，示例值：22。</li>
-	// <li>isp：按照运营商进行过滤，此参数只支持服务区域为中国大陆。对应的 Value 可选项如下：<br>   2：中国电信；<br>   26：中国联通；<br>   1046：中国移动；<br>   3947：中国铁通；<br>   38：教育网；<br>   43：长城宽带；<br>   0：其他运营商。</li>
-	// <li>domain：按照子域名进行过滤，示例值： www.example.com。</li>
-	// <li>url：按照 URL Path 进行过滤，示例值：/content 或 /content/test.jpg。若填写 url 参数，则最多可查询近 30 天的数据。</li>
-	// <li>referer：按照 Referer 请求头部进行过滤，示例值：http://www.example.com/。若填写 referer 参数，则最多可查询近 30 天的数据；</li>
-	// <li>resourceType：按照资源类型进行过滤，资源类型一般是文件后缀，示例值：.jpg。若填写 resourceType 参数，则最多可查询近 30 天的数据；</li>
-	// <li>protocol：按照 HTTP 协议版本进行过滤。对应的 Value 可选项如下：<br>   HTTP/1.0；<br>   HTTP/1.1；<br>   HTTP/2.0；<br>   HTTP/3；<br>   WebSocket。</li>
-	// <li>socket：按照 HTTP协议类型进行过滤。对应的 Value 可选项如下：<br>   HTTP：HTTP 协议；<br>   HTTPS：HTTPS 协议；<br>   QUIC：QUIC 协议。</li>
-	// <li>statusCode：按照边缘状态码进行过滤。若填写 statusCode 参数，则最多可查询近 30 天的数据。对应的 Value 可选项如下：<br>   1XX：1xx类型的状态码；<br>   2XX：2xx类型的状态码；<br>   3XX：3xx类型的状态码；<br>   4XX：4xx类型的状态码；<br>   5XX：5xx类型的状态码；<br>   在 [0,600) 范围内的整数。</li>
-	// <li>browserType：按照浏览器类型进行过滤。若填写 browserType 参数，则最多可查询近 30 天的数据。对应 Value 的可选项如下：<br>   Firefox：Firefox浏览器；<br>   Chrome：Chrome浏览器；<br>   Safari：Safari浏览器；<br>   Other：其他浏览器类型；<br>   Empty：浏览器类型为空；<br>   Bot：搜索引擎爬虫；<br>   MicrosoftEdge：MicrosoftEdge浏览器；<br>   IE：IE浏览器；<br>   Opera：Opera浏览器；<br>   QQBrowser：QQ浏览器；<br>   LBBrowser：LB浏览器；<br>   MaxthonBrowser：Maxthon浏览器；<br>   SouGouBrowser：搜狗浏览器；<br>   BIDUBrowser：百度浏览器；<br>   TaoBrowser：淘浏览器；<br>   UBrowser：UC浏览器。</li>
-	// <li>deviceType：按照设备类型进行过滤。若填写 deviceType 参数，则最多可查询近 30 天的数据。对应 Value 的可选项如下：<br>   TV：TV设备；<br>   Tablet：Tablet设备；<br>   Mobile：Mobile设备；<br>   Desktop：Desktop设备；<br>   Other：其他设备类型；<br>   Empty：设备类型为空。</li>
-	// <li>operatingSystemType：按照操作系统类型进行过滤。若填写 operatingSystemType 参数，则最多可查询近 30 天的数据。对应 Value 的可选项如下：<br>   Linux：Linux操作系统；<br>   MacOS：MacOs操作系统；<br>   Android：Android操作系统；<br>   IOS：IOS操作系统；<br>   Windows：Windows操作系统；<br>   NetBSD：NetBSD；<br>   ChromiumOS：ChromiumOS；<br>   Bot：搜索引擎爬虫；<br>   Other：其他类型的操作系统；<br>   Empty：操作系统为空。</li>
-	// <li>tlsVersion：按照 TLS 版本进行过滤。若填写 tlsVersion 参数，则最多可查询近 30 天的数据。对应 Value 的可选项如下：<br>   TLS1.0；<br>   TLS1.1；<br>   TLS1.2；<br>   TLS1.3。</li>
-	// <li>ipVersion：按照 IP 版本进行过滤。对应 Value 的可选项如下：<br>   4：IPv4；<br>   6：IPv6。</li>
-	// <li>cacheType：按照缓存状态进行过滤。对应 Value 的可选项如下：<br>   hit：请求命中 EdgeOne 节点缓存，资源由节点缓存提供。资源部分命中缓存也会记录为 hit。<br>   miss：请求未命中 EdgeOne 节点缓存，资源由源站提供。<br>   dynamic：请求的资源无法缓存/未配置被节点缓存，资源由源站提供。<br>   other：无法被识别的缓存状态。边缘函数响应的请求会记录为 other。</li>
-	// <li>clientIp：按照客户端 IP 进行过滤。若填写 clientIp 参数，则最多可查询近 30 天的数据。</li>
-	// <li>userAgent：按照 User-Agent 请求头部进行过滤。若填写 userAgent 参数，则最多可查询近 30 天的数据。</li>
+	// 筛选数据时使用的过滤条件，取值参考 [指标分析筛选条件说明](https://cloud.tencent.com/document/product/1552/98219#1aaf1150-55a4-4b4d-b103-3a8317ac7945) 中针对 L7 访问流量、带宽、请求数的可用筛选项。
+	// 如需限定站点或内容标识符，请在 `ZoneIds.N` 参数中另行传入对应的值。
 	Filters []*QueryCondition `json:"Filters,omitnil,omitempty" name:"Filters"`
 
-	// 数据归属地区。该参数已废弃。请在 Filters.country 中按客户端地域过滤数据。
+	// 数据归属地区。该参数已废弃。请在 `Filters.country` 中按客户端地域过滤数据。
 	Area *string `json:"Area,omitnil,omitempty" name:"Area"`
 }
 
@@ -10800,7 +11988,6 @@ type DescribeTopL7AnalysisDataRequestParams struct {
 	// <li> l7Flow_request_ua_browser：按浏览器类型维度统计 L7 访问请求数指标；</li>
 	// <li> l7Flow_request_ua_os：按操作系统类型维度统计 L7 访问请求数指标；</li>
 	// <li> l7Flow_request_ua：按 User-Agent 维度统计 L7 访问请求数指标。</li>
-	// 
 	MetricName *string `json:"MetricName,omitnil,omitempty" name:"MetricName"`
 
 	// 站点 ID 集合，此参数必填。最多传入 100 个站点 ID。若需查询腾讯云主账号下所有站点数据，请用 `*` 代替，查询账号级别数据需具备本接口全部站点资源权限。
@@ -10809,35 +11996,14 @@ type DescribeTopL7AnalysisDataRequestParams struct {
 	// 查询前多少个 top 数据，最大值为1000。不填默认为10，表示查询 top10 的数据。
 	Limit *int64 `json:"Limit,omitnil,omitempty" name:"Limit"`
 
-	// 过滤条件，详细的过滤条件 Key 值如下：
-	// <li>country：按照国家/地区进行过滤，国家/地区遵循 <a href="https://baike.baidu.com/item/ISO%203166-1/5269555">ISO 3166-1 alpha-2</a> 规范。示例值：CN。</li>
-	// <li>province：按照省份进行过滤，此参数只支持服务区域为中国大陆。省份代码参考<a href="https://cloud.tencent.com/document/product/228/6316#.E5.8C.BA.E5.9F.9F-.2F-.E8.BF.90.E8.90.A5.E5.95.86.E6.98.A0.E5.B0.84.E8.A1.A8">境内省份映射表</a>，示例值：22。</li>
-	// <li>isp：按照运营商进行过滤，此参数只支持服务区域为中国大陆。对应的 Value 可选项如下：<br>   2：中国电信；<br>   26：中国联通；<br>   1046：中国移动；<br>   3947：中国铁通；<br>   38：教育网；<br>   43：长城宽带；<br>   0：其他运营商。</li>
-	// <li>domain：按照子域名进行过滤，示例值： www.example.com。</li>
-	// <li>url：按照 URL Path 进行过滤，示例值：/content 或 /content/test.jpg。若填写 url 参数，则最多可查询近 30 天的数据。</li>
-	// <li>referer：按照 Referer 请求头部进行过滤，示例值：http://www.example.com/。若填写 referer 参数，则最多可查询近 30 天的数据；</li>
-	// <li>resourceType：按照资源类型进行过滤，资源类型一般是文件后缀，示例值：.jpg。若填写 resourceType 参数，则最多可查询近 30 天的数据；</li>
-	// <li>protocol：按照 HTTP 协议版本进行过滤。对应的 Value 可选项如下：<br>   HTTP/1.0；<br>   HTTP/1.1；<br>   HTTP/2.0；<br>   HTTP/3；<br>   WebSocket。</li>
-	// <li>socket：按照 HTTP协议类型进行过滤。对应的 Value 可选项如下：<br>   HTTP：HTTP 协议；<br>   HTTPS：HTTPS 协议；<br>   QUIC：QUIC 协议。</li>
-	// <li>statusCode：按照边缘状态码进行过滤。若填写 statusCode 参数，则最多可查询近 30 天的数据。对应的 Value 可选项如下：<br>   1XX：1xx类型的状态码；<br>   2XX：2xx类型的状态码；<br>   3XX：3xx类型的状态码；<br>   4XX：4xx类型的状态码；<br>   5XX：5xx类型的状态码；<br>   在 [0,600) 范围内的整数。</li>
-	// <li>browserType：按照浏览器类型进行过滤。若填写 browserType 参数，则最多可查询近 30 天的数据。对应 Value 的可选项如下：<br>   Firefox：Firefox浏览器；<br>   Chrome：Chrome浏览器；<br>   Safari：Safari浏览器；<br>   Other：其他浏览器类型；<br>   Empty：浏览器类型为空；<br>   Bot：搜索引擎爬虫；<br>   MicrosoftEdge：MicrosoftEdge浏览器；<br>   IE：IE浏览器；<br>   Opera：Opera浏览器；<br>   QQBrowser：QQ浏览器；<br>   LBBrowser：LB浏览器；<br>   MaxthonBrowser：Maxthon浏览器；<br>   SouGouBrowser：搜狗浏览器；<br>   BIDUBrowser：百度浏览器；<br>   TaoBrowser：淘浏览器；<br>   UBrowser：UC浏览器。</li>
-	// <li>deviceType：按照设备类型进行过滤。若填写 deviceType 参数，则最多可查询近 30 天的数据。对应 Value 的可选项如下：<br>   TV：TV设备；<br>   Tablet：Tablet设备；<br>   Mobile：Mobile设备；<br>   Desktop：Desktop设备；<br>   Other：其他设备类型；<br>   Empty：设备类型为空。</li>
-	// <li>operatingSystemType：按照操作系统类型进行过滤。若填写 operatingSystemType 参数，则最多可查询近 30 天的数据。对应 Value 的可选项如下：<br>   Linux：Linux操作系统；<br>   MacOS：MacOs操作系统；<br>   Android：Android操作系统；<br>   IOS：IOS操作系统；<br>   Windows：Windows操作系统；<br>   NetBSD：NetBSD；<br>   ChromiumOS：ChromiumOS；<br>   Bot：搜索引擎爬虫；<br>   Other：其他类型的操作系统；<br>   Empty：操作系统为空。</li>
-	// <li>tlsVersion：按照 TLS 版本进行过滤。若填写 tlsVersion 参数，则最多可查询近 30 天的数据。对应 Value 的可选项如下：<br>   TLS1.0；<br>   TLS1.1；<br>   TLS1.2；<br>   TLS1.3。</li>
-	// <li>ipVersion：按照 IP 版本进行过滤。对应 Value 的可选项如下：<br>   4：IPv4；<br>   6：IPv6。</li>
-	// <li>cacheType：按照缓存状态进行过滤。对应 Value 的可选项如下：<br>   hit：请求命中 EdgeOne 节点缓存，资源由节点缓存提供。资源部分命中缓存也会记录为 hit。<br>   miss：请求未命中 EdgeOne 节点缓存，资源由源站提供。<br>   dynamic：请求的资源无法缓存/未配置被节点缓存，资源由源站提供。<br>   other：无法被识别的缓存状态。边缘函数响应的请求会记录为 other。</li>
-	// <li>clientIp：按照客户端 IP 进行过滤。若填写 clientIp 参数，则最多可查询近 30 天的数据。</li>
-	// <li>userAgent：按照 User-Agent 请求头部进行过滤。若填写 userAgent 参数，则最多可查询近 30 天的数据。</li>
+	// 筛选数据时使用的过滤条件，取值参考 [指标分析筛选条件说明](https://cloud.tencent.com/document/product/1552/98219#1aaf1150-55a4-4b4d-b103-3a8317ac7945) 中针对 L7 访问流量、带宽、请求数的可用筛选项。
+	// 如需限定站点或内容标识符，请在 `ZoneIds.N` 参数中另行传入对应的值。
 	Filters []*QueryCondition `json:"Filters,omitnil,omitempty" name:"Filters"`
 
-	// 查询时间粒度，取值有：
-	// <li>min: 1分钟；</li>
-	// <li>5min: 5分钟；</li>
-	// <li>hour: 1小时；</li>
-	// <li>day: 1天。</li>不填将根据开始时间跟结束时间的间距自动推算粒度，具体为：2 小时范围内以 min 粒度查询，2 天范围内以 5min 粒度查询，7 天范围内以 hour 粒度查询，超过 7 天以 day 粒度查询。
+	// 查询时间粒度，该参数无效，待废弃。
 	Interval *string `json:"Interval,omitnil,omitempty" name:"Interval"`
 
-	// 数据归属地区。该参数已废弃。请在 Filters.country 中按客户端地域过滤数据。
+	// 数据归属地区。该参数已废弃。请在 `Filters.country` 中按客户端地域过滤数据。
 	Area *string `json:"Area,omitnil,omitempty" name:"Area"`
 }
 
@@ -10875,7 +12041,6 @@ type DescribeTopL7AnalysisDataRequest struct {
 	// <li> l7Flow_request_ua_browser：按浏览器类型维度统计 L7 访问请求数指标；</li>
 	// <li> l7Flow_request_ua_os：按操作系统类型维度统计 L7 访问请求数指标；</li>
 	// <li> l7Flow_request_ua：按 User-Agent 维度统计 L7 访问请求数指标。</li>
-	// 
 	MetricName *string `json:"MetricName,omitnil,omitempty" name:"MetricName"`
 
 	// 站点 ID 集合，此参数必填。最多传入 100 个站点 ID。若需查询腾讯云主账号下所有站点数据，请用 `*` 代替，查询账号级别数据需具备本接口全部站点资源权限。
@@ -10884,35 +12049,14 @@ type DescribeTopL7AnalysisDataRequest struct {
 	// 查询前多少个 top 数据，最大值为1000。不填默认为10，表示查询 top10 的数据。
 	Limit *int64 `json:"Limit,omitnil,omitempty" name:"Limit"`
 
-	// 过滤条件，详细的过滤条件 Key 值如下：
-	// <li>country：按照国家/地区进行过滤，国家/地区遵循 <a href="https://baike.baidu.com/item/ISO%203166-1/5269555">ISO 3166-1 alpha-2</a> 规范。示例值：CN。</li>
-	// <li>province：按照省份进行过滤，此参数只支持服务区域为中国大陆。省份代码参考<a href="https://cloud.tencent.com/document/product/228/6316#.E5.8C.BA.E5.9F.9F-.2F-.E8.BF.90.E8.90.A5.E5.95.86.E6.98.A0.E5.B0.84.E8.A1.A8">境内省份映射表</a>，示例值：22。</li>
-	// <li>isp：按照运营商进行过滤，此参数只支持服务区域为中国大陆。对应的 Value 可选项如下：<br>   2：中国电信；<br>   26：中国联通；<br>   1046：中国移动；<br>   3947：中国铁通；<br>   38：教育网；<br>   43：长城宽带；<br>   0：其他运营商。</li>
-	// <li>domain：按照子域名进行过滤，示例值： www.example.com。</li>
-	// <li>url：按照 URL Path 进行过滤，示例值：/content 或 /content/test.jpg。若填写 url 参数，则最多可查询近 30 天的数据。</li>
-	// <li>referer：按照 Referer 请求头部进行过滤，示例值：http://www.example.com/。若填写 referer 参数，则最多可查询近 30 天的数据；</li>
-	// <li>resourceType：按照资源类型进行过滤，资源类型一般是文件后缀，示例值：.jpg。若填写 resourceType 参数，则最多可查询近 30 天的数据；</li>
-	// <li>protocol：按照 HTTP 协议版本进行过滤。对应的 Value 可选项如下：<br>   HTTP/1.0；<br>   HTTP/1.1；<br>   HTTP/2.0；<br>   HTTP/3；<br>   WebSocket。</li>
-	// <li>socket：按照 HTTP协议类型进行过滤。对应的 Value 可选项如下：<br>   HTTP：HTTP 协议；<br>   HTTPS：HTTPS 协议；<br>   QUIC：QUIC 协议。</li>
-	// <li>statusCode：按照边缘状态码进行过滤。若填写 statusCode 参数，则最多可查询近 30 天的数据。对应的 Value 可选项如下：<br>   1XX：1xx类型的状态码；<br>   2XX：2xx类型的状态码；<br>   3XX：3xx类型的状态码；<br>   4XX：4xx类型的状态码；<br>   5XX：5xx类型的状态码；<br>   在 [0,600) 范围内的整数。</li>
-	// <li>browserType：按照浏览器类型进行过滤。若填写 browserType 参数，则最多可查询近 30 天的数据。对应 Value 的可选项如下：<br>   Firefox：Firefox浏览器；<br>   Chrome：Chrome浏览器；<br>   Safari：Safari浏览器；<br>   Other：其他浏览器类型；<br>   Empty：浏览器类型为空；<br>   Bot：搜索引擎爬虫；<br>   MicrosoftEdge：MicrosoftEdge浏览器；<br>   IE：IE浏览器；<br>   Opera：Opera浏览器；<br>   QQBrowser：QQ浏览器；<br>   LBBrowser：LB浏览器；<br>   MaxthonBrowser：Maxthon浏览器；<br>   SouGouBrowser：搜狗浏览器；<br>   BIDUBrowser：百度浏览器；<br>   TaoBrowser：淘浏览器；<br>   UBrowser：UC浏览器。</li>
-	// <li>deviceType：按照设备类型进行过滤。若填写 deviceType 参数，则最多可查询近 30 天的数据。对应 Value 的可选项如下：<br>   TV：TV设备；<br>   Tablet：Tablet设备；<br>   Mobile：Mobile设备；<br>   Desktop：Desktop设备；<br>   Other：其他设备类型；<br>   Empty：设备类型为空。</li>
-	// <li>operatingSystemType：按照操作系统类型进行过滤。若填写 operatingSystemType 参数，则最多可查询近 30 天的数据。对应 Value 的可选项如下：<br>   Linux：Linux操作系统；<br>   MacOS：MacOs操作系统；<br>   Android：Android操作系统；<br>   IOS：IOS操作系统；<br>   Windows：Windows操作系统；<br>   NetBSD：NetBSD；<br>   ChromiumOS：ChromiumOS；<br>   Bot：搜索引擎爬虫；<br>   Other：其他类型的操作系统；<br>   Empty：操作系统为空。</li>
-	// <li>tlsVersion：按照 TLS 版本进行过滤。若填写 tlsVersion 参数，则最多可查询近 30 天的数据。对应 Value 的可选项如下：<br>   TLS1.0；<br>   TLS1.1；<br>   TLS1.2；<br>   TLS1.3。</li>
-	// <li>ipVersion：按照 IP 版本进行过滤。对应 Value 的可选项如下：<br>   4：IPv4；<br>   6：IPv6。</li>
-	// <li>cacheType：按照缓存状态进行过滤。对应 Value 的可选项如下：<br>   hit：请求命中 EdgeOne 节点缓存，资源由节点缓存提供。资源部分命中缓存也会记录为 hit。<br>   miss：请求未命中 EdgeOne 节点缓存，资源由源站提供。<br>   dynamic：请求的资源无法缓存/未配置被节点缓存，资源由源站提供。<br>   other：无法被识别的缓存状态。边缘函数响应的请求会记录为 other。</li>
-	// <li>clientIp：按照客户端 IP 进行过滤。若填写 clientIp 参数，则最多可查询近 30 天的数据。</li>
-	// <li>userAgent：按照 User-Agent 请求头部进行过滤。若填写 userAgent 参数，则最多可查询近 30 天的数据。</li>
+	// 筛选数据时使用的过滤条件，取值参考 [指标分析筛选条件说明](https://cloud.tencent.com/document/product/1552/98219#1aaf1150-55a4-4b4d-b103-3a8317ac7945) 中针对 L7 访问流量、带宽、请求数的可用筛选项。
+	// 如需限定站点或内容标识符，请在 `ZoneIds.N` 参数中另行传入对应的值。
 	Filters []*QueryCondition `json:"Filters,omitnil,omitempty" name:"Filters"`
 
-	// 查询时间粒度，取值有：
-	// <li>min: 1分钟；</li>
-	// <li>5min: 5分钟；</li>
-	// <li>hour: 1小时；</li>
-	// <li>day: 1天。</li>不填将根据开始时间跟结束时间的间距自动推算粒度，具体为：2 小时范围内以 min 粒度查询，2 天范围内以 5min 粒度查询，7 天范围内以 hour 粒度查询，超过 7 天以 day 粒度查询。
+	// 查询时间粒度，该参数无效，待废弃。
 	Interval *string `json:"Interval,omitnil,omitempty" name:"Interval"`
 
-	// 数据归属地区。该参数已废弃。请在 Filters.country 中按客户端地域过滤数据。
+	// 数据归属地区。该参数已废弃。请在 `Filters.country` 中按客户端地域过滤数据。
 	Area *string `json:"Area,omitnil,omitempty" name:"Area"`
 }
 
@@ -12477,6 +13621,26 @@ type ForceRedirectHTTPSParameters struct {
 	RedirectStatusCode *int64 `json:"RedirectStatusCode,omitnil,omitempty" name:"RedirectStatusCode"`
 }
 
+type FrequentScanningProtection struct {
+	// 高频扫描防护规则是否开启。取值有：<li>on：开启，高频扫描防护规则生效；</li><li>off：关闭，高频扫描防护规则不生效。</li>	
+	Enabled *string `json:"Enabled,omitnil,omitempty" name:"Enabled"`
+
+	// 高频扫描防护的处置动作。 当 Enabled 为 on 时，此字段必填。SecurityAction 的 Name 取值支持：<li>Deny：拦截，响应拦截页面；</li><li>Monitor：观察，不处理请求记录安全事件到日志中；</li><li>JSChallenge：JavaScript 挑战，响应 JavaScript 挑战页面。</li>
+	Action *SecurityAction `json:"Action,omitnil,omitempty" name:"Action"`
+
+	// 请求统计的匹配方式，当 Enabled 为 on 时，此字段必填。取值有：<li>http.request.xff_header_ip：客户端 IP（优先匹配 XFF 头部）；</li><li>http.request.ip：客户端 IP。</li> 
+	CountBy *string `json:"CountBy,omitnil,omitempty" name:"CountBy"`
+
+	// 此参数指定高频扫描防护的阈值，即在 CountingPeriod 所设置时间范围内命中「配置为拦截」的托管规则时的累计拦截次数，取值范围 1 ~ 4294967294，例如 100，当超过此统计值时，后续请求将触发 Action 所设置的处置动作。当 Enabled 为 on 时，此字段必填。
+	BlockThreshold *int64 `json:"BlockThreshold,omitnil,omitempty" name:"BlockThreshold"`
+
+	// 此参数指定高频扫描防护所统计的时间窗口，即命中「配置为拦截」的托管规则的请求的统计时间窗口，取值 5 ~ 1800，单位仅支持秒（s），例如 5s。 当 Enabled 为 on 时，此字段必填。
+	CountingPeriod *string `json:"CountingPeriod,omitnil,omitempty" name:"CountingPeriod"`
+
+	// 此参数指定高频扫描防护 Action 参数所设置处置动作的持续时长，取值范围 60 ~ 86400，单位仅支持秒（s），例如 60s。当 Enabled 为 on 时，此字段必填。
+	ActionDuration *string `json:"ActionDuration,omitnil,omitempty" name:"ActionDuration"`
+}
+
 type Function struct {
 	// 函数 ID。
 	FunctionId *string `json:"FunctionId,omitnil,omitempty" name:"FunctionId"`
@@ -13248,6 +14412,57 @@ type JITVideoProcess struct {
 	Switch *string `json:"Switch,omitnil,omitempty" name:"Switch"`
 }
 
+type JSInjectionRule struct {
+	// 规则 ID。
+	RuleId *string `json:"RuleId,omitnil,omitempty" name:"RuleId"`
+
+	// 规则名称。
+	Name *string `json:"Name,omitnil,omitempty" name:"Name"`
+
+	// 规则优先级，数值越小越优先执行，范围是 0 ~ 100，默认为 0。
+	Priority *int64 `json:"Priority,omitnil,omitempty" name:"Priority"`
+
+	// 匹配条件内容。需符合表达式语法，详细规范参见产品文档。
+	Condition *string `json:"Condition,omitnil,omitempty" name:"Condition"`
+
+	// JavaScript 注入选项。默认值为 run-attestations，取值有：
+	// <li> no-injection: 不注入 JavaScript;</li>
+	// <li> inject-sdk-only: 注入当前支持的所有认证方式的 SDK，当前支持：TC-RCE 和 TC-CAPTCHA。注意：若需执行认证检测，请配置挑战规则。</li>
+	InjectJS *string `json:"InjectJS,omitnil,omitempty" name:"InjectJS"`
+}
+
+type JustInTimeTranscodeTemplate struct {
+	// 即时转码模板唯一标识。
+	TemplateId *string `json:"TemplateId,omitnil,omitempty" name:"TemplateId"`
+
+	// 转码模板名称。
+	TemplateName *string `json:"TemplateName,omitnil,omitempty" name:"TemplateName"`
+
+	// 模板描述信息。
+	Comment *string `json:"Comment,omitnil,omitempty" name:"Comment"`
+
+	// 模板类型，取值：<li>preset：系统预置模板；</li><li>custom：用户自定义模板。</li>
+	Type *string `json:"Type,omitnil,omitempty" name:"Type"`
+
+	// 启用视频流开关，取值：<li>on：开启；</li><li>off：关闭。</li>
+	VideoStreamSwitch *string `json:"VideoStreamSwitch,omitnil,omitempty" name:"VideoStreamSwitch"`
+
+	// 启用音频流开关，取值：<li>on：开启；</li><li>off：关闭。</li>
+	AudioStreamSwitch *string `json:"AudioStreamSwitch,omitnil,omitempty" name:"AudioStreamSwitch"`
+
+	// 视频流配置参数，仅当 VideoStreamSwitch 为 on，该字段有效。
+	VideoTemplate *VideoTemplateInfo `json:"VideoTemplate,omitnil,omitempty" name:"VideoTemplate"`
+
+	// 音频流配置参数，仅当 AudioStreamSwitch 为 on，该字段有效。
+	AudioTemplate *AudioTemplateInfo `json:"AudioTemplate,omitnil,omitempty" name:"AudioTemplate"`
+
+	// 模板创建时间，使用 [ISO 日期格式](https://cloud.tencent.com/document/product/266/11732#I)。
+	CreateTime *string `json:"CreateTime,omitnil,omitempty" name:"CreateTime"`
+
+	// 模板最后修改时间，使用 [ISO 日期格式](https://cloud.tencent.com/document/product/266/11732#I)。
+	UpdateTime *string `json:"UpdateTime,omitnil,omitempty" name:"UpdateTime"`
+}
+
 type L4OfflineLog struct {
 	// 四层代理实例 ID。
 	ProxyId *string `json:"ProxyId,omitnil,omitempty" name:"ProxyId"`
@@ -13599,6 +14814,9 @@ type ManagedRules struct {
 
 	// 托管规则组的配置。如果此结构传空数组或 GroupId 未包含在列表内将按照默认方式处理。
 	ManagedRuleGroups []*ManagedRuleGroup `json:"ManagedRuleGroups,omitnil,omitempty" name:"ManagedRuleGroups"`
+
+	// 高频扫描防护配置选项，当某一访客的请求频繁命中「配置为拦截」的托管规则时，在一段时间内封禁该访客所有请求。
+	FrequentScanningProtection *FrequentScanningProtection `json:"FrequentScanningProtection,omitnil,omitempty" name:"FrequentScanningProtection"`
 }
 
 type MaxAge struct {
@@ -16413,6 +17631,189 @@ func (r *ModifyRuleResponse) FromJsonString(s string) error {
 }
 
 // Predefined struct for user
+type ModifySecurityAPIResourceRequestParams struct {
+	// 站点 ID。	
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// API 资源列表。
+	APIResources []*APIResource `json:"APIResources,omitnil,omitempty" name:"APIResources"`
+}
+
+type ModifySecurityAPIResourceRequest struct {
+	*tchttp.BaseRequest
+	
+	// 站点 ID。	
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// API 资源列表。
+	APIResources []*APIResource `json:"APIResources,omitnil,omitempty" name:"APIResources"`
+}
+
+func (r *ModifySecurityAPIResourceRequest) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *ModifySecurityAPIResourceRequest) FromJsonString(s string) error {
+	f := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(s), &f); err != nil {
+		return err
+	}
+	delete(f, "ZoneId")
+	delete(f, "APIResources")
+	if len(f) > 0 {
+		return tcerr.NewTencentCloudSDKError("ClientError.BuildRequestError", "ModifySecurityAPIResourceRequest has unknown keys!", "")
+	}
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type ModifySecurityAPIResourceResponseParams struct {
+	// 唯一请求 ID，由服务端生成，每次请求都会返回（若请求因其他原因未能抵达服务端，则该次请求不会获得 RequestId）。定位问题时需要提供该次请求的 RequestId。
+	RequestId *string `json:"RequestId,omitnil,omitempty" name:"RequestId"`
+}
+
+type ModifySecurityAPIResourceResponse struct {
+	*tchttp.BaseResponse
+	Response *ModifySecurityAPIResourceResponseParams `json:"Response"`
+}
+
+func (r *ModifySecurityAPIResourceResponse) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *ModifySecurityAPIResourceResponse) FromJsonString(s string) error {
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type ModifySecurityAPIServiceRequestParams struct {
+	// 站点 ID。	
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// API 服务列表。
+	APIServices []*APIService `json:"APIServices,omitnil,omitempty" name:"APIServices"`
+}
+
+type ModifySecurityAPIServiceRequest struct {
+	*tchttp.BaseRequest
+	
+	// 站点 ID。	
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// API 服务列表。
+	APIServices []*APIService `json:"APIServices,omitnil,omitempty" name:"APIServices"`
+}
+
+func (r *ModifySecurityAPIServiceRequest) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *ModifySecurityAPIServiceRequest) FromJsonString(s string) error {
+	f := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(s), &f); err != nil {
+		return err
+	}
+	delete(f, "ZoneId")
+	delete(f, "APIServices")
+	if len(f) > 0 {
+		return tcerr.NewTencentCloudSDKError("ClientError.BuildRequestError", "ModifySecurityAPIServiceRequest has unknown keys!", "")
+	}
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type ModifySecurityAPIServiceResponseParams struct {
+	// 唯一请求 ID，由服务端生成，每次请求都会返回（若请求因其他原因未能抵达服务端，则该次请求不会获得 RequestId）。定位问题时需要提供该次请求的 RequestId。
+	RequestId *string `json:"RequestId,omitnil,omitempty" name:"RequestId"`
+}
+
+type ModifySecurityAPIServiceResponse struct {
+	*tchttp.BaseResponse
+	Response *ModifySecurityAPIServiceResponseParams `json:"Response"`
+}
+
+func (r *ModifySecurityAPIServiceResponse) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *ModifySecurityAPIServiceResponse) FromJsonString(s string) error {
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type ModifySecurityClientAttesterRequestParams struct {
+	// 站点 ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 认证选项列表。
+	ClientAttesters []*ClientAttester `json:"ClientAttesters,omitnil,omitempty" name:"ClientAttesters"`
+}
+
+type ModifySecurityClientAttesterRequest struct {
+	*tchttp.BaseRequest
+	
+	// 站点 ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 认证选项列表。
+	ClientAttesters []*ClientAttester `json:"ClientAttesters,omitnil,omitempty" name:"ClientAttesters"`
+}
+
+func (r *ModifySecurityClientAttesterRequest) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *ModifySecurityClientAttesterRequest) FromJsonString(s string) error {
+	f := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(s), &f); err != nil {
+		return err
+	}
+	delete(f, "ZoneId")
+	delete(f, "ClientAttesters")
+	if len(f) > 0 {
+		return tcerr.NewTencentCloudSDKError("ClientError.BuildRequestError", "ModifySecurityClientAttesterRequest has unknown keys!", "")
+	}
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type ModifySecurityClientAttesterResponseParams struct {
+	// 唯一请求 ID，由服务端生成，每次请求都会返回（若请求因其他原因未能抵达服务端，则该次请求不会获得 RequestId）。定位问题时需要提供该次请求的 RequestId。
+	RequestId *string `json:"RequestId,omitnil,omitempty" name:"RequestId"`
+}
+
+type ModifySecurityClientAttesterResponse struct {
+	*tchttp.BaseResponse
+	Response *ModifySecurityClientAttesterResponseParams `json:"Response"`
+}
+
+func (r *ModifySecurityClientAttesterResponse) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *ModifySecurityClientAttesterResponse) FromJsonString(s string) error {
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
 type ModifySecurityIPGroupRequestParams struct {
 	// 站点 Id。
 	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
@@ -16477,6 +17878,67 @@ func (r *ModifySecurityIPGroupResponse) ToJsonString() string {
 // FromJsonString It is highly **NOT** recommended to use this function
 // because it has no param check, nor strict type check
 func (r *ModifySecurityIPGroupResponse) FromJsonString(s string) error {
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type ModifySecurityJSInjectionRuleRequestParams struct {
+	// 站点 ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// JavaScript 注入规则列表。
+	JSInjectionRules []*JSInjectionRule `json:"JSInjectionRules,omitnil,omitempty" name:"JSInjectionRules"`
+}
+
+type ModifySecurityJSInjectionRuleRequest struct {
+	*tchttp.BaseRequest
+	
+	// 站点 ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// JavaScript 注入规则列表。
+	JSInjectionRules []*JSInjectionRule `json:"JSInjectionRules,omitnil,omitempty" name:"JSInjectionRules"`
+}
+
+func (r *ModifySecurityJSInjectionRuleRequest) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *ModifySecurityJSInjectionRuleRequest) FromJsonString(s string) error {
+	f := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(s), &f); err != nil {
+		return err
+	}
+	delete(f, "ZoneId")
+	delete(f, "JSInjectionRules")
+	if len(f) > 0 {
+		return tcerr.NewTencentCloudSDKError("ClientError.BuildRequestError", "ModifySecurityJSInjectionRuleRequest has unknown keys!", "")
+	}
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type ModifySecurityJSInjectionRuleResponseParams struct {
+	// 唯一请求 ID，由服务端生成，每次请求都会返回（若请求因其他原因未能抵达服务端，则该次请求不会获得 RequestId）。定位问题时需要提供该次请求的 RequestId。
+	RequestId *string `json:"RequestId,omitnil,omitempty" name:"RequestId"`
+}
+
+type ModifySecurityJSInjectionRuleResponse struct {
+	*tchttp.BaseResponse
+	Response *ModifySecurityJSInjectionRuleResponseParams `json:"Response"`
+}
+
+func (r *ModifySecurityJSInjectionRuleResponse) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *ModifySecurityJSInjectionRuleResponse) FromJsonString(s string) error {
 	return json.Unmarshal([]byte(s), &r)
 }
 
@@ -17523,7 +18985,7 @@ type OriginRecord struct {
 	// 源站记录ID。
 	RecordId *string `json:"RecordId,omitnil,omitempty" name:"RecordId"`
 
-	// 源站权重，取值为0-100, 不填表示不设置权重，由系统自由调度，填0表示权重为0, 流量将不会调度到此源站。
+	// 【源站权重】：用于控制流量分配优先级的参数，取值范围：0-100（整数）：<li>空值：不设置权重，系统按默认策略调度；</li><li>0 值：明确设置权重为0，流量将不会分配到该源站，注意事项：必须确保至少有一个源站的权重值大于0；</li><li>正常值：数值越大分配流量越多 ；</li>
 	// 注意：此字段可能返回 null，表示取不到有效值。
 	Weight *uint64 `json:"Weight,omitnil,omitempty" name:"Weight"`
 
@@ -18260,8 +19722,8 @@ type Resource struct {
 	PlanId *string `json:"PlanId,omitnil,omitempty" name:"PlanId"`
 
 	// 地域，取值有：
-	// <li>mainland：国内；</li>
-	// <li>overseas：海外。</li>
+	// <li>mainland：中国大陆境内；</li>
+	// <li>overseas：中国大陆境外。</li>
 	// <li>global：全球。</li>
 	Area *string `json:"Area,omitnil,omitempty" name:"Area"`
 
@@ -19156,6 +20618,19 @@ type SwitchConfig struct {
 	WebSwitch *string `json:"WebSwitch,omitnil,omitempty" name:"WebSwitch"`
 }
 
+type TCCaptchaOption struct {
+	// CaptchaAppId 信息。
+	CaptchaAppId *string `json:"CaptchaAppId,omitnil,omitempty" name:"CaptchaAppId"`
+
+	// AppSecretKey 信息。
+	AppSecretKey *string `json:"AppSecretKey,omitnil,omitempty" name:"AppSecretKey"`
+}
+
+type TCRCEOption struct {
+	// Channel 信息。
+	Channel *string `json:"Channel,omitnil,omitempty" name:"Channel"`
+}
+
 type TLSConfigParameters struct {
 	// TLS 版本。至少填写一个，如果是多个时，需要为连续版本号，例如：开启 TLS1、1.1、1.2 和 1.3，不可仅开启 1 和 1.2 而关闭 1.1。取值有：<li>TLSv1：TLSv1 版本；</li><li>TLSv1.1：TLSv1.1 版本；</li><li>TLSv1.2：TLSv1.2 版本；</li><li>TLSv1.3：TLSv1.3 版本。</li>
 	Version []*string `json:"Version,omitnil,omitempty" name:"Version"`
@@ -19192,7 +20667,7 @@ type Task struct {
 	// 状态。取值有：
 	// <li>processing：处理中；</li>
 	// <li>success：成功；</li>
-	// <li> failed：失败；</li>
+	// <li>failed：失败；</li>
 	// <li>timeout：超时；</li>
 	// <li>canceled：已取消。</li>
 	Status *string `json:"Status,omitnil,omitempty" name:"Status"`
@@ -19202,6 +20677,17 @@ type Task struct {
 
 	// 任务完成时间。
 	UpdateTime *string `json:"UpdateTime,omitnil,omitempty" name:"UpdateTime"`
+
+	// 刷新、预热失败类型。取值有：
+	// <li>taskFailed：任务失败；</li>
+	// <li>quotaExceeded：配额超限；</li>
+	// <li>downloadManifestFailed：下载描述文件失败；</li>
+	// <li>accessDenied：访问被拒绝。</li>
+	// <li>originPullFailed：回源失败。</li>
+	FailType *string `json:"FailType,omitnil,omitempty" name:"FailType"`
+
+	// 清除缓存、预热缓存的失败原因描述。
+	FailMessage *string `json:"FailMessage,omitnil,omitempty" name:"FailMessage"`
 }
 
 type TemplateConfig struct {
@@ -19554,6 +21040,33 @@ func (r *VerifyOwnershipResponse) ToJsonString() string {
 // because it has no param check, nor strict type check
 func (r *VerifyOwnershipResponse) FromJsonString(s string) error {
 	return json.Unmarshal([]byte(s), &r)
+}
+
+type VideoTemplateInfo struct {
+	// 视频流的编码格式，可选值：<li>H.264: 使用 H.264 编码；</li><li>H.265: 使用 H.265 编码。</li>
+	Codec *string `json:"Codec,omitnil,omitempty" name:"Codec"`
+
+	// 视频帧率，取值范围：[0, 30]，单位：Hz。
+	// 取值为 0，表示帧率和原始视频保持一致，但最大不超过 30。
+	// 默认值：0。
+	Fps *float64 `json:"Fps,omitnil,omitempty" name:"Fps"`
+
+	// 视频流的码率，取值范围：0 和 [128, 10000]，单位：kbps。
+	// 取值为 0，表示自动根据视频画面和质量选择视频码率。
+	// 默认值：0。
+	Bitrate *uint64 `json:"Bitrate,omitnil,omitempty" name:"Bitrate"`
+
+	// 分辨率自适应，可选值：<li>open：开启，此时，Width 代表视频的长边，Height 表示视频的短边；</li><li>close：关闭，此时，Width 代表视频的宽度，Height 表示视频的高度。</li>默认值：open。
+	ResolutionAdaptive *string `json:"ResolutionAdaptive,omitnil,omitempty" name:"ResolutionAdaptive"`
+
+	// 视频流宽度（或长边）的最大值，取值范围：0 和 [128, 1920]，单位：px。<li>当 Width、Height 均为 0，则分辨率同源；</li><li>当 Width 为 0，Height 非 0，则 Width 按比例缩放；</li><li>当 Width 非 0，Height 为 0，则 Height 按比例缩放；</li><li>当 Width、Height 均非 0，则分辨率按用户指定。</li>默认值：0。
+	Width *uint64 `json:"Width,omitnil,omitempty" name:"Width"`
+
+	// 视频流高度（或短边）的最大值，取值范围：0 和 [128, 1080]，单位：px。<li>当 Width、Height 均为 0，则分辨率同源；</li><li>当 Width 为 0，Height 非 0，则 Width 按比例缩放；</li><li>当 Width 非 0，Height 为 0，则 Height 按比例缩放；</li><li>当 Width、Height 均非 0，则分辨率按用户指定。</li>默认值：0。
+	Height *uint64 `json:"Height,omitnil,omitempty" name:"Height"`
+
+	// 填充方式，当视频流配置宽高参数与原始视频的宽高比不一致时，对转码的处理方式，即为“填充”。可选填充方式：<li> stretch：拉伸，对每一帧进行拉伸，填满整个画面，可能导致转码后的视频被“压扁”或者“拉长”。</li><li>black：留黑，保持视频宽高比不变，边缘剩余部分使用黑色填充。</li><li>white：留白，保持视频宽高比不变，边缘剩余部分使用白色填充。</li><li>gauss：高斯模糊，保持视频宽高比不变，边缘剩余部分使用高斯模糊填充。</li>默认值：black 。
+	FillType *string `json:"FillType,omitnil,omitempty" name:"FillType"`
 }
 
 type Waf struct {
