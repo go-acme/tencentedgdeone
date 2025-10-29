@@ -279,6 +279,64 @@ func CheckCnameStatusWithContext(ctx context.Context, c *Client, request *CheckC
     return
 }
 
+func NewConfirmMultiPathGatewayOriginACLRequest() (request *ConfirmMultiPathGatewayOriginACLRequest) {
+    request = &ConfirmMultiPathGatewayOriginACLRequest{
+        BaseRequest: &tchttp.BaseRequest{},
+    }
+    
+    request.Init().WithApiInfo("teo", APIVersion, "ConfirmMultiPathGatewayOriginACL")
+    
+    
+    return
+}
+
+func NewConfirmMultiPathGatewayOriginACLResponse() (response *ConfirmMultiPathGatewayOriginACLResponse) {
+    response = &ConfirmMultiPathGatewayOriginACLResponse{
+        BaseResponse: &tchttp.BaseResponse{},
+    } 
+    return
+
+}
+
+// ConfirmMultiPathGatewayOriginACL
+// 本接口用于多通道安全加速网关回源 IP 网段发生变更时，确认已将最新回源 IP 网段更新至源站防火墙。
+//
+// 可能返回的错误码:
+//  INTERNALERROR = "InternalError"
+//  INVALIDPARAMETER = "InvalidParameter"
+//  UNAUTHORIZEDOPERATION_CAMUNAUTHORIZED = "UnauthorizedOperation.CamUnauthorized"
+//  UNAUTHORIZEDOPERATION_NOPERMISSION = "UnauthorizedOperation.NoPermission"
+//  UNAUTHORIZEDOPERATION_UNKNOWN = "UnauthorizedOperation.Unknown"
+func ConfirmMultiPathGatewayOriginACL(c *Client, request *ConfirmMultiPathGatewayOriginACLRequest) (response *ConfirmMultiPathGatewayOriginACLResponse, err error) {
+    return ConfirmMultiPathGatewayOriginACLWithContext(context.Background(), c, request)
+}
+
+// ConfirmMultiPathGatewayOriginACL
+// 本接口用于多通道安全加速网关回源 IP 网段发生变更时，确认已将最新回源 IP 网段更新至源站防火墙。
+//
+// 可能返回的错误码:
+//  INTERNALERROR = "InternalError"
+//  INVALIDPARAMETER = "InvalidParameter"
+//  UNAUTHORIZEDOPERATION_CAMUNAUTHORIZED = "UnauthorizedOperation.CamUnauthorized"
+//  UNAUTHORIZEDOPERATION_NOPERMISSION = "UnauthorizedOperation.NoPermission"
+//  UNAUTHORIZEDOPERATION_UNKNOWN = "UnauthorizedOperation.Unknown"
+func ConfirmMultiPathGatewayOriginACLWithContext(ctx context.Context, c *Client, request *ConfirmMultiPathGatewayOriginACLRequest) (response *ConfirmMultiPathGatewayOriginACLResponse, err error) {
+    if request == nil {
+        request = NewConfirmMultiPathGatewayOriginACLRequest()
+    }
+    c.InitBaseRequest(&request.BaseRequest, "teo", APIVersion, "ConfirmMultiPathGatewayOriginACL")
+    
+    if c.GetCredential() == nil {
+        return nil, errors.New("ConfirmMultiPathGatewayOriginACL require credential")
+    }
+
+    request.SetContext(ctx)
+    
+    response = NewConfirmMultiPathGatewayOriginACLResponse()
+    err = c.Send(request, response)
+    return
+}
+
 func NewConfirmOriginACLUpdateRequest() (request *ConfirmOriginACLUpdateRequest) {
     request = &ConfirmOriginACLUpdateRequest{
         BaseRequest: &tchttp.BaseRequest{},
@@ -1259,7 +1317,7 @@ func NewCreateFunctionRuleResponse() (response *CreateFunctionRuleResponse) {
 }
 
 // CreateFunctionRule
-// 创建边缘函数的触发规则。
+// 创建边缘函数的触发规则。支持通过自定义过滤条件来决定是否需要执行函数，当需要执行函数时，提供了多种选择目标函数的方式，包括：直接指定，基于客户端归属地区选择和基于权重选择。
 //
 // 可能返回的错误码:
 //  FAILEDOPERATION = "FailedOperation"
@@ -1276,7 +1334,7 @@ func CreateFunctionRule(c *Client, request *CreateFunctionRuleRequest) (response
 }
 
 // CreateFunctionRule
-// 创建边缘函数的触发规则。
+// 创建边缘函数的触发规则。支持通过自定义过滤条件来决定是否需要执行函数，当需要执行函数时，提供了多种选择目标函数的方式，包括：直接指定，基于客户端归属地区选择和基于权重选择。
 //
 // 可能返回的错误码:
 //  FAILEDOPERATION = "FailedOperation"
@@ -7331,6 +7389,64 @@ func DescribeMultiPathGatewayLineWithContext(ctx context.Context, c *Client, req
     return
 }
 
+func NewDescribeMultiPathGatewayOriginACLRequest() (request *DescribeMultiPathGatewayOriginACLRequest) {
+    request = &DescribeMultiPathGatewayOriginACLRequest{
+        BaseRequest: &tchttp.BaseRequest{},
+    }
+    
+    request.Init().WithApiInfo("teo", APIVersion, "DescribeMultiPathGatewayOriginACL")
+    
+    
+    return
+}
+
+func NewDescribeMultiPathGatewayOriginACLResponse() (response *DescribeMultiPathGatewayOriginACLResponse) {
+    response = &DescribeMultiPathGatewayOriginACLResponse{
+        BaseResponse: &tchttp.BaseResponse{},
+    } 
+    return
+
+}
+
+// DescribeMultiPathGatewayOriginACL
+// 本接口用于查询多通道安全加速网关实例与回源 IP 网段的绑定关系，以及回源 IP 网段详情。若 MultiPathGatewayNextOriginACL 字段有返回值，则需要将最新的回源 IP 网段同步到源站防火墙配置中。
+//
+// 可能返回的错误码:
+//  INTERNALERROR = "InternalError"
+//  INVALIDPARAMETER = "InvalidParameter"
+//  UNAUTHORIZEDOPERATION_CAMUNAUTHORIZED = "UnauthorizedOperation.CamUnauthorized"
+//  UNAUTHORIZEDOPERATION_NOPERMISSION = "UnauthorizedOperation.NoPermission"
+//  UNAUTHORIZEDOPERATION_UNKNOWN = "UnauthorizedOperation.Unknown"
+func DescribeMultiPathGatewayOriginACL(c *Client, request *DescribeMultiPathGatewayOriginACLRequest) (response *DescribeMultiPathGatewayOriginACLResponse, err error) {
+    return DescribeMultiPathGatewayOriginACLWithContext(context.Background(), c, request)
+}
+
+// DescribeMultiPathGatewayOriginACL
+// 本接口用于查询多通道安全加速网关实例与回源 IP 网段的绑定关系，以及回源 IP 网段详情。若 MultiPathGatewayNextOriginACL 字段有返回值，则需要将最新的回源 IP 网段同步到源站防火墙配置中。
+//
+// 可能返回的错误码:
+//  INTERNALERROR = "InternalError"
+//  INVALIDPARAMETER = "InvalidParameter"
+//  UNAUTHORIZEDOPERATION_CAMUNAUTHORIZED = "UnauthorizedOperation.CamUnauthorized"
+//  UNAUTHORIZEDOPERATION_NOPERMISSION = "UnauthorizedOperation.NoPermission"
+//  UNAUTHORIZEDOPERATION_UNKNOWN = "UnauthorizedOperation.Unknown"
+func DescribeMultiPathGatewayOriginACLWithContext(ctx context.Context, c *Client, request *DescribeMultiPathGatewayOriginACLRequest) (response *DescribeMultiPathGatewayOriginACLResponse, err error) {
+    if request == nil {
+        request = NewDescribeMultiPathGatewayOriginACLRequest()
+    }
+    c.InitBaseRequest(&request.BaseRequest, "teo", APIVersion, "DescribeMultiPathGatewayOriginACL")
+    
+    if c.GetCredential() == nil {
+        return nil, errors.New("DescribeMultiPathGatewayOriginACL require credential")
+    }
+
+    request.SetContext(ctx)
+    
+    response = NewDescribeMultiPathGatewayOriginACLResponse()
+    err = c.Send(request, response)
+    return
+}
+
 func NewDescribeMultiPathGatewayRegionsRequest() (request *DescribeMultiPathGatewayRegionsRequest) {
     request = &DescribeMultiPathGatewayRegionsRequest{
         BaseRequest: &tchttp.BaseRequest{},
@@ -8823,6 +8939,58 @@ func DescribeTimingL7CacheDataWithContext(ctx context.Context, c *Client, reques
     request.SetContext(ctx)
     
     response = NewDescribeTimingL7CacheDataResponse()
+    err = c.Send(request, response)
+    return
+}
+
+func NewDescribeTimingL7OriginPullDataRequest() (request *DescribeTimingL7OriginPullDataRequest) {
+    request = &DescribeTimingL7OriginPullDataRequest{
+        BaseRequest: &tchttp.BaseRequest{},
+    }
+    
+    request.Init().WithApiInfo("teo", APIVersion, "DescribeTimingL7OriginPullData")
+    
+    
+    return
+}
+
+func NewDescribeTimingL7OriginPullDataResponse() (response *DescribeTimingL7OriginPullDataResponse) {
+    response = &DescribeTimingL7OriginPullDataResponse{
+        BaseResponse: &tchttp.BaseResponse{},
+    } 
+    return
+
+}
+
+// DescribeTimingL7OriginPullData
+// 本接口用以查询七层域名业务的回源时序数据。
+//
+// 可能返回的错误码:
+//  LIMITEXCEEDED_QUERYTIMELIMITEXCEEDED = "LimitExceeded.QueryTimeLimitExceeded"
+//  OPERATIONDENIED_ORIGINPULLDATANOTSUPPORTED = "OperationDenied.OriginPullDataNotSupported"
+func DescribeTimingL7OriginPullData(c *Client, request *DescribeTimingL7OriginPullDataRequest) (response *DescribeTimingL7OriginPullDataResponse, err error) {
+    return DescribeTimingL7OriginPullDataWithContext(context.Background(), c, request)
+}
+
+// DescribeTimingL7OriginPullData
+// 本接口用以查询七层域名业务的回源时序数据。
+//
+// 可能返回的错误码:
+//  LIMITEXCEEDED_QUERYTIMELIMITEXCEEDED = "LimitExceeded.QueryTimeLimitExceeded"
+//  OPERATIONDENIED_ORIGINPULLDATANOTSUPPORTED = "OperationDenied.OriginPullDataNotSupported"
+func DescribeTimingL7OriginPullDataWithContext(ctx context.Context, c *Client, request *DescribeTimingL7OriginPullDataRequest) (response *DescribeTimingL7OriginPullDataResponse, err error) {
+    if request == nil {
+        request = NewDescribeTimingL7OriginPullDataRequest()
+    }
+    c.InitBaseRequest(&request.BaseRequest, "teo", APIVersion, "DescribeTimingL7OriginPullData")
+    
+    if c.GetCredential() == nil {
+        return nil, errors.New("DescribeTimingL7OriginPullData require credential")
+    }
+
+    request.SetContext(ctx)
+    
+    response = NewDescribeTimingL7OriginPullDataResponse()
     err = c.Send(request, response)
     return
 }
@@ -10793,7 +10961,7 @@ func NewModifyFunctionRuleResponse() (response *ModifyFunctionRuleResponse) {
 }
 
 // ModifyFunctionRule
-// 修改边缘函数触发规则，支持修改规则条件、执行函数以及描述信息。
+// 修改边缘函数触发规则，支持修改规则条件、执行函数以及描述信息。您可以先通过 DescribeFunctionRules 接口来获取需要修改的规则的 RuleId，然后传入修改后的规则内容，原规则内容会被覆盖式更新。
 //
 // 可能返回的错误码:
 //  FAILEDOPERATION = "FailedOperation"
@@ -10809,7 +10977,7 @@ func ModifyFunctionRule(c *Client, request *ModifyFunctionRuleRequest) (response
 }
 
 // ModifyFunctionRule
-// 修改边缘函数触发规则，支持修改规则条件、执行函数以及描述信息。
+// 修改边缘函数触发规则，支持修改规则条件、执行函数以及描述信息。您可以先通过 DescribeFunctionRules 接口来获取需要修改的规则的 RuleId，然后传入修改后的规则内容，原规则内容会被覆盖式更新。
 //
 // 可能返回的错误码:
 //  FAILEDOPERATION = "FailedOperation"
@@ -12001,6 +12169,64 @@ func ModifyMultiPathGatewaySecretKeyWithContext(ctx context.Context, c *Client, 
     request.SetContext(ctx)
     
     response = NewModifyMultiPathGatewaySecretKeyResponse()
+    err = c.Send(request, response)
+    return
+}
+
+func NewModifyMultiPathGatewayStatusRequest() (request *ModifyMultiPathGatewayStatusRequest) {
+    request = &ModifyMultiPathGatewayStatusRequest{
+        BaseRequest: &tchttp.BaseRequest{},
+    }
+    
+    request.Init().WithApiInfo("teo", APIVersion, "ModifyMultiPathGatewayStatus")
+    
+    
+    return
+}
+
+func NewModifyMultiPathGatewayStatusResponse() (response *ModifyMultiPathGatewayStatusResponse) {
+    response = &ModifyMultiPathGatewayStatusResponse{
+        BaseResponse: &tchttp.BaseResponse{},
+    } 
+    return
+
+}
+
+// ModifyMultiPathGatewayStatus
+// 更新多通道安全网关状态。
+//
+// 可能返回的错误码:
+//  INTERNALERROR = "InternalError"
+//  INVALIDPARAMETER = "InvalidParameter"
+//  INVALIDPARAMETERVALUE = "InvalidParameterValue"
+//  MISSINGPARAMETER = "MissingParameter"
+//  OPERATIONDENIED = "OperationDenied"
+func ModifyMultiPathGatewayStatus(c *Client, request *ModifyMultiPathGatewayStatusRequest) (response *ModifyMultiPathGatewayStatusResponse, err error) {
+    return ModifyMultiPathGatewayStatusWithContext(context.Background(), c, request)
+}
+
+// ModifyMultiPathGatewayStatus
+// 更新多通道安全网关状态。
+//
+// 可能返回的错误码:
+//  INTERNALERROR = "InternalError"
+//  INVALIDPARAMETER = "InvalidParameter"
+//  INVALIDPARAMETERVALUE = "InvalidParameterValue"
+//  MISSINGPARAMETER = "MissingParameter"
+//  OPERATIONDENIED = "OperationDenied"
+func ModifyMultiPathGatewayStatusWithContext(ctx context.Context, c *Client, request *ModifyMultiPathGatewayStatusRequest) (response *ModifyMultiPathGatewayStatusResponse, err error) {
+    if request == nil {
+        request = NewModifyMultiPathGatewayStatusRequest()
+    }
+    c.InitBaseRequest(&request.BaseRequest, "teo", APIVersion, "ModifyMultiPathGatewayStatus")
+    
+    if c.GetCredential() == nil {
+        return nil, errors.New("ModifyMultiPathGatewayStatus require credential")
+    }
+
+    request.SetContext(ctx)
+    
+    response = NewModifyMultiPathGatewayStatusResponse()
     err = c.Send(request, response)
     return
 }

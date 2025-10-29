@@ -2,4 +2,4 @@ module github.com/go-acme/tencentedgdeone
 
 go 1.14
 
-require github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.1.19
+require github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.1.48
