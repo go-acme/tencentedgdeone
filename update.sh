@@ -2,7 +2,7 @@
 
 ## Get latest version of the module
 # https://pkg.go.dev/github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/teo?tab=versions
-LIB_VERSION=$(go list -m -json github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/teo@latest | jq -r '.Version')
+LIB_VERSION=$(go list -u -m -retracted -json github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/teo@latest | jq -r '.Version')
 # LIB_VERSION=v1.0.1208
 
 SRC_ORG=TencentCloud
@@ -69,6 +69,7 @@ git rm -f -r --ignore-unmatch '*'
 
 ## Copy the code from the sources
 cp -r ${SRC_DIR}/tencentcloud/teo/. .
+cp -r ${SRC_DIR}/LICENSE .
 
 ## Remove old version
 rm -rf v20220106
