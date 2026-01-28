@@ -45,6 +45,90 @@ func NewClient(credential common.CredentialIface, region string, clientProfile *
 }
 
 
+func NewApplyFreeCertificateRequest() (request *ApplyFreeCertificateRequest) {
+    request = &ApplyFreeCertificateRequest{
+        BaseRequest: &tchttp.BaseRequest{},
+    }
+    
+    request.Init().WithApiInfo("teo", APIVersion, "ApplyFreeCertificate")
+    
+    
+    return
+}
+
+func NewApplyFreeCertificateResponse() (response *ApplyFreeCertificateResponse) {
+    response = &ApplyFreeCertificateResponse{
+        BaseResponse: &tchttp.BaseResponse{},
+    } 
+    return
+
+}
+
+// ApplyFreeCertificate
+// 申请免费证书时，如果您需要通过使用 DNS 委派验证或者文件验证进行申请，您可以调用该接口来进行发起证书申请并根据申请方式来获取对应的验证内容。调用接口的顺序如下：
+//
+// 第一步：调用 ApplyFreeCertificate，指定申请免费证书的校验方式，获取验证内容；
+//
+// 第二步：为相应域名按照验证内容配置；
+//
+// 第三步：调用CheckFreeCertificateVerification 验证，验证通过后即完成免费证书申请；
+//
+// 第四步：调用ModifyHostsCertificate，下发域名证书为使用 EdgeOne 免费证书配置。
+//
+// 
+//
+// 申请方式的介绍可参考文档：[免费证书申请说明](https://cloud.tencent.com/document/product/1552/90437) 
+//
+// 说明：
+//
+// - 仅 CNAME 接入模式可调用该接口来指定免费证书申请方式。NS/DNSPod 托管接入模式都是使用自动验证来申请免费证书，无需调用该接口。
+//
+// - 如果您需要切换免费证书验证方式，您可以重新调用本接口通过修改 VerificationMethod 字段来进行变更。
+//
+// - 同个域名只能申请一本免费证书，在调用本接口后，后台会触发申请免费证书相关任务，您需要在2 天内，完成域名验证信息的相关配置，然后完成证书验证。
+func ApplyFreeCertificate(c *Client, request *ApplyFreeCertificateRequest) (response *ApplyFreeCertificateResponse, err error) {
+    return ApplyFreeCertificateWithContext(context.Background(), c, request)
+}
+
+// ApplyFreeCertificate
+// 申请免费证书时，如果您需要通过使用 DNS 委派验证或者文件验证进行申请，您可以调用该接口来进行发起证书申请并根据申请方式来获取对应的验证内容。调用接口的顺序如下：
+//
+// 第一步：调用 ApplyFreeCertificate，指定申请免费证书的校验方式，获取验证内容；
+//
+// 第二步：为相应域名按照验证内容配置；
+//
+// 第三步：调用CheckFreeCertificateVerification 验证，验证通过后即完成免费证书申请；
+//
+// 第四步：调用ModifyHostsCertificate，下发域名证书为使用 EdgeOne 免费证书配置。
+//
+// 
+//
+// 申请方式的介绍可参考文档：[免费证书申请说明](https://cloud.tencent.com/document/product/1552/90437) 
+//
+// 说明：
+//
+// - 仅 CNAME 接入模式可调用该接口来指定免费证书申请方式。NS/DNSPod 托管接入模式都是使用自动验证来申请免费证书，无需调用该接口。
+//
+// - 如果您需要切换免费证书验证方式，您可以重新调用本接口通过修改 VerificationMethod 字段来进行变更。
+//
+// - 同个域名只能申请一本免费证书，在调用本接口后，后台会触发申请免费证书相关任务，您需要在2 天内，完成域名验证信息的相关配置，然后完成证书验证。
+func ApplyFreeCertificateWithContext(ctx context.Context, c *Client, request *ApplyFreeCertificateRequest) (response *ApplyFreeCertificateResponse, err error) {
+    if request == nil {
+        request = NewApplyFreeCertificateRequest()
+    }
+    c.InitBaseRequest(&request.BaseRequest, "teo", APIVersion, "ApplyFreeCertificate")
+    
+    if c.GetCredential() == nil {
+        return nil, errors.New("ApplyFreeCertificate require credential")
+    }
+
+    request.SetContext(ctx)
+    
+    response = NewApplyFreeCertificateResponse()
+    err = c.Send(request, response)
+    return
+}
+
 func NewBindSecurityTemplateToEntityRequest() (request *BindSecurityTemplateToEntityRequest) {
     request = &BindSecurityTemplateToEntityRequest{
         BaseRequest: &tchttp.BaseRequest{},
@@ -275,6 +359,66 @@ func CheckCnameStatusWithContext(ctx context.Context, c *Client, request *CheckC
     request.SetContext(ctx)
     
     response = NewCheckCnameStatusResponse()
+    err = c.Send(request, response)
+    return
+}
+
+func NewCheckFreeCertificateVerificationRequest() (request *CheckFreeCertificateVerificationRequest) {
+    request = &CheckFreeCertificateVerificationRequest{
+        BaseRequest: &tchttp.BaseRequest{},
+    }
+    
+    request.Init().WithApiInfo("teo", APIVersion, "CheckFreeCertificateVerification")
+    
+    
+    return
+}
+
+func NewCheckFreeCertificateVerificationResponse() (response *CheckFreeCertificateVerificationResponse) {
+    response = &CheckFreeCertificateVerificationResponse{
+        BaseResponse: &tchttp.BaseResponse{},
+    } 
+    return
+
+}
+
+// CheckFreeCertificateVerification
+// 该接口用于验证免费证书并获取免费证书申请结果。如果验证通过，可通过该接口查询到对应域名申请的免费证书信息，如果申请失败，该接口将返回对应的验证失败信息。
+//
+// 在触发[申请免费证书接口](https://cloud.tencent.com/document/product/1552/90437)后，您可以通过本接口检查免费证书申请结果。在免费证书申请成功后， 还需要通过[配置域名证书](https://cloud.tencent.com/document/product/1552/80764)接口配置，才能将免费证书部署至加速域上。
+//
+// 可能返回的错误码:
+//  INTERNALERROR_PROXYSERVER = "InternalError.ProxyServer"
+//  UNAUTHORIZEDOPERATION_CAMUNAUTHORIZED = "UnauthorizedOperation.CamUnauthorized"
+//  UNAUTHORIZEDOPERATION_NOPERMISSION = "UnauthorizedOperation.NoPermission"
+//  UNAUTHORIZEDOPERATION_UNKNOWN = "UnauthorizedOperation.Unknown"
+func CheckFreeCertificateVerification(c *Client, request *CheckFreeCertificateVerificationRequest) (response *CheckFreeCertificateVerificationResponse, err error) {
+    return CheckFreeCertificateVerificationWithContext(context.Background(), c, request)
+}
+
+// CheckFreeCertificateVerification
+// 该接口用于验证免费证书并获取免费证书申请结果。如果验证通过，可通过该接口查询到对应域名申请的免费证书信息，如果申请失败，该接口将返回对应的验证失败信息。
+//
+// 在触发[申请免费证书接口](https://cloud.tencent.com/document/product/1552/90437)后，您可以通过本接口检查免费证书申请结果。在免费证书申请成功后， 还需要通过[配置域名证书](https://cloud.tencent.com/document/product/1552/80764)接口配置，才能将免费证书部署至加速域上。
+//
+// 可能返回的错误码:
+//  INTERNALERROR_PROXYSERVER = "InternalError.ProxyServer"
+//  UNAUTHORIZEDOPERATION_CAMUNAUTHORIZED = "UnauthorizedOperation.CamUnauthorized"
+//  UNAUTHORIZEDOPERATION_NOPERMISSION = "UnauthorizedOperation.NoPermission"
+//  UNAUTHORIZEDOPERATION_UNKNOWN = "UnauthorizedOperation.Unknown"
+func CheckFreeCertificateVerificationWithContext(ctx context.Context, c *Client, request *CheckFreeCertificateVerificationRequest) (response *CheckFreeCertificateVerificationResponse, err error) {
+    if request == nil {
+        request = NewCheckFreeCertificateVerificationRequest()
+    }
+    c.InitBaseRequest(&request.BaseRequest, "teo", APIVersion, "CheckFreeCertificateVerification")
+    
+    if c.GetCredential() == nil {
+        return nil, errors.New("CheckFreeCertificateVerification require credential")
+    }
+
+    request.SetContext(ctx)
+    
+    response = NewCheckFreeCertificateVerificationResponse()
     err = c.Send(request, response)
     return
 }
@@ -2431,6 +2575,8 @@ func NewCreateRealtimeLogDeliveryTaskResponse() (response *CreateRealtimeLogDeli
 //
 // - 当数据投递类型（LogType）为速率限制和 CC 攻击防护日志、托管规则日志、自定义规则日志、Bot 管理日志时，同一个实体在同种数据投递类型（LogType）和数据投递区域（Area）的组合下，只能被添加到一个实时日志投递任务中。
 //
+// - 当实时日志投递任务类型（TaskType）为 EdgeOne 日志分析（log_analysis）时，只支持数据投递类型（LogType）为站点加速日志（domain）；在同一站点（ZoneId）和数据投递区域（Area）的组合下，只能添加一个推送至 EdgeOne 日志分析的实时日志投递任务；。
+//
 // 
 //
 // 建议先通过 [DescribeRealtimeLogDeliveryTasks](https://cloud.tencent.com/document/product/1552/104110)  接口根据实体查询实时日志投递任务列表，检查实体是否已经被添加到另一实时日志投递任务中。
@@ -2472,6 +2618,8 @@ func CreateRealtimeLogDeliveryTask(c *Client, request *CreateRealtimeLogDelivery
 //     - 一个推送至腾讯云  CLS 的任务，加上另一个推送至 AWS S3 兼容对象存储的任务；
 //
 // - 当数据投递类型（LogType）为速率限制和 CC 攻击防护日志、托管规则日志、自定义规则日志、Bot 管理日志时，同一个实体在同种数据投递类型（LogType）和数据投递区域（Area）的组合下，只能被添加到一个实时日志投递任务中。
+//
+// - 当实时日志投递任务类型（TaskType）为 EdgeOne 日志分析（log_analysis）时，只支持数据投递类型（LogType）为站点加速日志（domain）；在同一站点（ZoneId）和数据投递区域（Area）的组合下，只能添加一个推送至 EdgeOne 日志分析的实时日志投递任务；。
 //
 // 
 //
@@ -7969,6 +8117,72 @@ func DescribePlansWithContext(ctx context.Context, c *Client, request *DescribeP
     return
 }
 
+func NewDescribePrefetchOriginLimitRequest() (request *DescribePrefetchOriginLimitRequest) {
+    request = &DescribePrefetchOriginLimitRequest{
+        BaseRequest: &tchttp.BaseRequest{},
+    }
+    
+    request.Init().WithApiInfo("teo", APIVersion, "DescribePrefetchOriginLimit")
+    
+    
+    return
+}
+
+func NewDescribePrefetchOriginLimitResponse() (response *DescribePrefetchOriginLimitResponse) {
+    response = &DescribePrefetchOriginLimitResponse{
+        BaseResponse: &tchttp.BaseResponse{},
+    } 
+    return
+
+}
+
+// DescribePrefetchOriginLimit
+// 本接口用于查询回源限速限制，该功能白名单内测中。
+//
+// 可能返回的错误码:
+//  FAILEDOPERATION = "FailedOperation"
+//  INTERNALERROR_BACKENDERROR = "InternalError.BackendError"
+//  INVALIDPARAMETER = "InvalidParameter"
+//  INVALIDPARAMETER_DOMAINNOTFOUND = "InvalidParameter.DomainNotFound"
+//  INVALIDPARAMETER_PREFETCHORIGINLIMITAREAINVALID = "InvalidParameter.PrefetchOriginLimitAreaInvalid"
+//  OPERATIONDENIED_NOTINPREFETCHORIGINLIMITWHITELIST = "OperationDenied.NotInPrefetchOriginLimitWhiteList"
+//  UNAUTHORIZEDOPERATION_CAMUNAUTHORIZED = "UnauthorizedOperation.CamUnauthorized"
+//  UNAUTHORIZEDOPERATION_NOPERMISSION = "UnauthorizedOperation.NoPermission"
+//  UNAUTHORIZEDOPERATION_UNKNOWN = "UnauthorizedOperation.Unknown"
+func DescribePrefetchOriginLimit(c *Client, request *DescribePrefetchOriginLimitRequest) (response *DescribePrefetchOriginLimitResponse, err error) {
+    return DescribePrefetchOriginLimitWithContext(context.Background(), c, request)
+}
+
+// DescribePrefetchOriginLimit
+// 本接口用于查询回源限速限制，该功能白名单内测中。
+//
+// 可能返回的错误码:
+//  FAILEDOPERATION = "FailedOperation"
+//  INTERNALERROR_BACKENDERROR = "InternalError.BackendError"
+//  INVALIDPARAMETER = "InvalidParameter"
+//  INVALIDPARAMETER_DOMAINNOTFOUND = "InvalidParameter.DomainNotFound"
+//  INVALIDPARAMETER_PREFETCHORIGINLIMITAREAINVALID = "InvalidParameter.PrefetchOriginLimitAreaInvalid"
+//  OPERATIONDENIED_NOTINPREFETCHORIGINLIMITWHITELIST = "OperationDenied.NotInPrefetchOriginLimitWhiteList"
+//  UNAUTHORIZEDOPERATION_CAMUNAUTHORIZED = "UnauthorizedOperation.CamUnauthorized"
+//  UNAUTHORIZEDOPERATION_NOPERMISSION = "UnauthorizedOperation.NoPermission"
+//  UNAUTHORIZEDOPERATION_UNKNOWN = "UnauthorizedOperation.Unknown"
+func DescribePrefetchOriginLimitWithContext(ctx context.Context, c *Client, request *DescribePrefetchOriginLimitRequest) (response *DescribePrefetchOriginLimitResponse, err error) {
+    if request == nil {
+        request = NewDescribePrefetchOriginLimitRequest()
+    }
+    c.InitBaseRequest(&request.BaseRequest, "teo", APIVersion, "DescribePrefetchOriginLimit")
+    
+    if c.GetCredential() == nil {
+        return nil, errors.New("DescribePrefetchOriginLimit require credential")
+    }
+
+    request.SetContext(ctx)
+    
+    response = NewDescribePrefetchOriginLimitResponse()
+    err = c.Send(request, response)
+    return
+}
+
 func NewDescribePrefetchTasksRequest() (request *DescribePrefetchTasksRequest) {
     request = &DescribePrefetchTasksRequest{
         BaseRequest: &tchttp.BaseRequest{},
@@ -8963,20 +9177,262 @@ func NewDescribeTimingL7OriginPullDataResponse() (response *DescribeTimingL7Orig
 }
 
 // DescribeTimingL7OriginPullData
-// 本接口用以查询七层域名业务的回源时序数据。
+// 本接口用以查询七层域名业务的回源时序数据，可以通过指定查询维度 <code>DimensionName</code> 进行分组查询，返回多组时序数据。
+//
+// 
+//
+// <p>单次请求最多返回 <strong>50,000</strong> 个数据项<code> TimingDataItem </code>。数据项总数的计算规则如下：</p>
+//
+// <pre>
+//
+//    指标个数 * 时间点个数 * 维度值个数 = 数据项总数
+//
+// </pre>
+//
+// <ul>
+//
+//   <li>
+//
+//     <strong>指标个数</strong>：<code>MetricNames</code> 的列表长度。
+//
+//   </li>
+//
+//   <li>
+//
+//     <strong>时间点个数</strong>：<code>(EndTime - StartTime) / Interval</code>。
+//
+//   </li>
+//
+//   <li>
+//
+//     <strong>维度值个数</strong>：
+//
+//     <ul>
+//
+//       <li>当未指定 <code>DimensionName</code> 时，默认按账号维度汇总数据，维度值个数为 1。</li>
+//
+//       <li>当 <code>DimensionName = domain</code> 时，维度值个数为 <code>Filters</code> 中 <code>domain</code> 过滤条件指定的域名列表长度。</li>
+//
+//       <li>当 <code>DimensionName = origin-status-code-category</code> 时，维度值个数默认为 <code>6</code>。</li>
+//
+//       <li>当 <code>DimensionName = origin-status-code</code> 时，维度值个数默认为 <code>600</code>。</li>
+//
+//     </ul>
+//
+//   </li>
+//
+// </ul>
+//
+// 
+//
+// <p><code>DimensionName</code> 可以与 <code>Filters</code> 组合使用，通过在 <code>Filters</code> 中指定 <code>DimensionName</code> 对应的过滤条件以限制维度值个数。</p>
+//
+// 
+//
+// <h3>示例</h3>
+//
+// <p>以查询某一小时的具体状态码维度的时序数据为例，假设查询条件如下：</p>
+//
+// <ul>
+//
+//   <li><code>MetricNames = ["l7Flow_request_hy"]</code>（指标个数 = 1）</li>
+//
+//   <li><code>StartTime = 2025-10-01T06:00:00+08:00</code>，<code>EndTime = 2025-10-01T06:59:59+08:00</code>，<code>Interval = "min"</code>（时间点个数 = 60）</li>
+//
+//   <li><code>DimensionName = origin-status-code</code>，<code>Filters = [{"originStatusCode": ["0", "4xx", "5xx"]}]</code>（维度值个数 = 201）</li>
+//
+// </ul>
+//
+// <p>则数据项总数为：</p>
+//
+// <pre>1 × 60 × 201 = 12060 </pre>
+//
+// <p>未超过限制。</p>
+//
+// 
+//
+// <p><strong>注意</strong>：若查询的数据项总数超过 <strong>50,000</strong>，系统会返回错误 <strong>LimitExceeded.TimingDataItemLimitExceeded</strong>。</p>
+//
+// <p>此时，请通过调整入参减少单次查询的数据项至 50,000 以内，可采取的做法有：</p>
+//
+// <ol>
+//
+//   <li>
+//
+//     <strong>减少时间点个数</strong>：
+//
+//     <ul>
+//
+//       <li>缩短查询时间范围（<code>StartTime</code> 到 <code>EndTime</code> 之间的时间跨度）。</li>
+//
+//       <li>选择更大的时间间隔（<code>Interval</code>）。</li>
+//
+//     </ul>
+//
+//   </li>
+//
+//   <li>
+//
+//     <strong>减少维度值个数</strong>：
+//
+//     <ul>
+//
+//       <li>调整 <code>Filters</code>，指定更少的 <code>domain</code> 或 <code>originStatusCode</code> 列表。</li>
+//
+//     </ul>
+//
+//   </li>
+//
+//   <li>
+//
+//     <strong>减少指标值个数</strong>：
+//
+//     <ul>
+//
+//       <li>调整 <code>MetricNames</code>，指定更少的查询指标。</li>
+//
+//     </ul>
+//
+//   </li>
+//
+// </ol>
 //
 // 可能返回的错误码:
+//  INVALIDPARAMETER_ACTIONINPROGRESS = "InvalidParameter.ActionInProgress"
+//  INVALIDPARAMETERVALUE_FILTERSMUSTINCLUDEDIMENSIONNAME = "InvalidParameterValue.FiltersMustIncludeDimensionName"
 //  LIMITEXCEEDED_QUERYTIMELIMITEXCEEDED = "LimitExceeded.QueryTimeLimitExceeded"
+//  LIMITEXCEEDED_TIMINGDATAITEMLIMITEXCEEDED = "LimitExceeded.TimingDataItemLimitExceeded"
 //  OPERATIONDENIED_ORIGINPULLDATANOTSUPPORTED = "OperationDenied.OriginPullDataNotSupported"
 func DescribeTimingL7OriginPullData(c *Client, request *DescribeTimingL7OriginPullDataRequest) (response *DescribeTimingL7OriginPullDataResponse, err error) {
     return DescribeTimingL7OriginPullDataWithContext(context.Background(), c, request)
 }
 
 // DescribeTimingL7OriginPullData
-// 本接口用以查询七层域名业务的回源时序数据。
+// 本接口用以查询七层域名业务的回源时序数据，可以通过指定查询维度 <code>DimensionName</code> 进行分组查询，返回多组时序数据。
+//
+// 
+//
+// <p>单次请求最多返回 <strong>50,000</strong> 个数据项<code> TimingDataItem </code>。数据项总数的计算规则如下：</p>
+//
+// <pre>
+//
+//    指标个数 * 时间点个数 * 维度值个数 = 数据项总数
+//
+// </pre>
+//
+// <ul>
+//
+//   <li>
+//
+//     <strong>指标个数</strong>：<code>MetricNames</code> 的列表长度。
+//
+//   </li>
+//
+//   <li>
+//
+//     <strong>时间点个数</strong>：<code>(EndTime - StartTime) / Interval</code>。
+//
+//   </li>
+//
+//   <li>
+//
+//     <strong>维度值个数</strong>：
+//
+//     <ul>
+//
+//       <li>当未指定 <code>DimensionName</code> 时，默认按账号维度汇总数据，维度值个数为 1。</li>
+//
+//       <li>当 <code>DimensionName = domain</code> 时，维度值个数为 <code>Filters</code> 中 <code>domain</code> 过滤条件指定的域名列表长度。</li>
+//
+//       <li>当 <code>DimensionName = origin-status-code-category</code> 时，维度值个数默认为 <code>6</code>。</li>
+//
+//       <li>当 <code>DimensionName = origin-status-code</code> 时，维度值个数默认为 <code>600</code>。</li>
+//
+//     </ul>
+//
+//   </li>
+//
+// </ul>
+//
+// 
+//
+// <p><code>DimensionName</code> 可以与 <code>Filters</code> 组合使用，通过在 <code>Filters</code> 中指定 <code>DimensionName</code> 对应的过滤条件以限制维度值个数。</p>
+//
+// 
+//
+// <h3>示例</h3>
+//
+// <p>以查询某一小时的具体状态码维度的时序数据为例，假设查询条件如下：</p>
+//
+// <ul>
+//
+//   <li><code>MetricNames = ["l7Flow_request_hy"]</code>（指标个数 = 1）</li>
+//
+//   <li><code>StartTime = 2025-10-01T06:00:00+08:00</code>，<code>EndTime = 2025-10-01T06:59:59+08:00</code>，<code>Interval = "min"</code>（时间点个数 = 60）</li>
+//
+//   <li><code>DimensionName = origin-status-code</code>，<code>Filters = [{"originStatusCode": ["0", "4xx", "5xx"]}]</code>（维度值个数 = 201）</li>
+//
+// </ul>
+//
+// <p>则数据项总数为：</p>
+//
+// <pre>1 × 60 × 201 = 12060 </pre>
+//
+// <p>未超过限制。</p>
+//
+// 
+//
+// <p><strong>注意</strong>：若查询的数据项总数超过 <strong>50,000</strong>，系统会返回错误 <strong>LimitExceeded.TimingDataItemLimitExceeded</strong>。</p>
+//
+// <p>此时，请通过调整入参减少单次查询的数据项至 50,000 以内，可采取的做法有：</p>
+//
+// <ol>
+//
+//   <li>
+//
+//     <strong>减少时间点个数</strong>：
+//
+//     <ul>
+//
+//       <li>缩短查询时间范围（<code>StartTime</code> 到 <code>EndTime</code> 之间的时间跨度）。</li>
+//
+//       <li>选择更大的时间间隔（<code>Interval</code>）。</li>
+//
+//     </ul>
+//
+//   </li>
+//
+//   <li>
+//
+//     <strong>减少维度值个数</strong>：
+//
+//     <ul>
+//
+//       <li>调整 <code>Filters</code>，指定更少的 <code>domain</code> 或 <code>originStatusCode</code> 列表。</li>
+//
+//     </ul>
+//
+//   </li>
+//
+//   <li>
+//
+//     <strong>减少指标值个数</strong>：
+//
+//     <ul>
+//
+//       <li>调整 <code>MetricNames</code>，指定更少的查询指标。</li>
+//
+//     </ul>
+//
+//   </li>
+//
+// </ol>
 //
 // 可能返回的错误码:
+//  INVALIDPARAMETER_ACTIONINPROGRESS = "InvalidParameter.ActionInProgress"
+//  INVALIDPARAMETERVALUE_FILTERSMUSTINCLUDEDIMENSIONNAME = "InvalidParameterValue.FiltersMustIncludeDimensionName"
 //  LIMITEXCEEDED_QUERYTIMELIMITEXCEEDED = "LimitExceeded.QueryTimeLimitExceeded"
+//  LIMITEXCEEDED_TIMINGDATAITEMLIMITEXCEEDED = "LimitExceeded.TimingDataItemLimitExceeded"
 //  OPERATIONDENIED_ORIGINPULLDATANOTSUPPORTED = "OperationDenied.OriginPullDataNotSupported"
 func DescribeTimingL7OriginPullDataWithContext(ctx context.Context, c *Client, request *DescribeTimingL7OriginPullDataRequest) (response *DescribeTimingL7OriginPullDataResponse, err error) {
     if request == nil {
@@ -11097,6 +11553,7 @@ func NewModifyHostsCertificateResponse() (response *ModifyHostsCertificateRespon
 //  FAILEDOPERATION_INVALIDZONESTATUS = "FailedOperation.InvalidZoneStatus"
 //  FAILEDOPERATION_MODIFYFAILED = "FailedOperation.ModifyFailed"
 //  FAILEDOPERATION_UPSTREAMCLIENTCERTIFICATEHASEXPIRED = "FailedOperation.UpstreamClientCertificateHasExpired"
+//  FAILEDOPERATION_UPSTREAMVERIFYCUSTOMCACERTIFICATEHASEXPIRED = "FailedOperation.UpstreamVerifyCustomCACertificateHasExpired"
 //  INTERNALERROR_CONFIGLOCKED = "InternalError.ConfigLocked"
 //  INTERNALERROR_GETROLEERROR = "InternalError.GetRoleError"
 //  INTERNALERROR_PROXYSERVER = "InternalError.ProxyServer"
@@ -11116,19 +11573,27 @@ func NewModifyHostsCertificateResponse() (response *ModifyHostsCertificateRespon
 //  INVALIDPARAMETER_INVALIDHTTPSCERTINFO = "InvalidParameter.InvalidHttpsCertInfo"
 //  INVALIDPARAMETER_INVALIDHTTPSTLSVERSION = "InvalidParameter.InvalidHttpsTlsVersion"
 //  INVALIDPARAMETER_UPSTREAMCLIENTCERTCHECKERROR = "InvalidParameter.UpstreamClientCertCheckError"
+//  INVALIDPARAMETER_UPSTREAMVERIFYCERTCHECKERROR = "InvalidParameter.UpstreamVerifyCertCheckError"
+//  INVALIDPARAMETER_UPSTREAMVERIFYCUSTOMCACERTNOINFO = "InvalidParameter.UpstreamVerifyCustomCACertNoInfo"
 //  INVALIDPARAMETER_ZONEISGRAYPUBLISHING = "InvalidParameter.ZoneIsGrayPublishing"
 //  INVALIDPARAMETERVALUE_ALIASDOMAINNOTSUPPORTEDGEMTLS = "InvalidParameterValue.AliasDomainNotSupportEdgeMTLS"
 //  INVALIDPARAMETERVALUE_ALIASDOMAINNOTSUPPORTUPSTREAMMTLS = "InvalidParameterValue.AliasDomainNotSupportUpstreamMTLS"
+//  INVALIDPARAMETERVALUE_ALIASDOMAINNOTSUPPORTUPSTREAMVERIFY = "InvalidParameterValue.AliasDomainNotSupportUpstreamVerify"
 //  INVALIDPARAMETERVALUE_CERTIFICATEVERIFYCLIENTMUSTCA = "InvalidParameterValue.CertificateVerifyClientMustCa"
 //  INVALIDPARAMETERVALUE_CERTIFICATEVERIFYCLIENTNEEDCERT = "InvalidParameterValue.CertificateVerifyClientNeedCert"
 //  INVALIDPARAMETERVALUE_CERTIFICATEVERIFYUPSTREAMCLIENTMUSTRSAORECC = "InvalidParameterValue.CertificateVerifyUpstreamClientMustRSAorECC"
 //  INVALIDPARAMETERVALUE_CERTIFICATEVERIFYUPSTREAMCLIENTMUSTSVR = "InvalidParameterValue.CertificateVerifyUpstreamClientMustSVR"
 //  INVALIDPARAMETERVALUE_CERTIFICATEVERIFYUPSTREAMCLIENTNEEDCERT = "InvalidParameterValue.CertificateVerifyUpstreamClientNeedCert"
+//  INVALIDPARAMETERVALUE_CERTIFICATEVERIFYUPSTREAMVERIFYCUSTOMCAMUSTCA = "InvalidParameterValue.CertificateVerifyUpstreamVerifyCustomCAMustCA"
+//  INVALIDPARAMETERVALUE_CERTIFICATEVERIFYUPSTREAMVERIFYCUSTOMCAMUSTRSAORECC = "InvalidParameterValue.CertificateVerifyUpstreamVerifyCustomCAMustRSAorECC"
+//  INVALIDPARAMETERVALUE_CERTIFICATEVERIFYUPSTREAMVERIFYCUSTOMCANEEDCERT = "InvalidParameterValue.CertificateVerifyUpstreamVerifyCustomCANeedCert"
 //  INVALIDPARAMETERVALUE_CLIENTCERTINFOQUOTALIMIT = "InvalidParameterValue.ClientCertInfoQuotaLimit"
 //  INVALIDPARAMETERVALUE_INVALIDKEYLESSSERVERID = "InvalidParameterValue.InvalidKeylessServerId"
+//  INVALIDPARAMETERVALUE_OCDIRECTORIGINDOMAINNOTSUPPORTUPSTREAMVERIFY = "InvalidParameterValue.OCDirectOriginDomainNotSupportUpstreamVerify"
 //  INVALIDPARAMETERVALUE_SERVERCERTINFONEEDCONTAINRSAORECC = "InvalidParameterValue.ServerCertInfoNeedContainRSAorECC"
 //  INVALIDPARAMETERVALUE_SERVERCERTINFONEEDCONTAINSM2 = "InvalidParameterValue.ServerCertInfoNeedContainSM2"
 //  INVALIDPARAMETERVALUE_UPSTREAMCLIENTCERTINFOQUOTALIMIT = "InvalidParameterValue.UpstreamClientCertInfoQuotaLimit"
+//  INVALIDPARAMETERVALUE_UPSTREAMVERIFYCUSTOMCACERTINFOQUOTALIMIT = "InvalidParameterValue.UpstreamVerifyCustomCACertInfoQuotaLimit"
 //  LIMITEXCEEDED_RATELIMITEXCEEDED = "LimitExceeded.RateLimitExceeded"
 //  OPERATIONDENIED = "OperationDenied"
 //  OPERATIONDENIED_CERTIFICATEPRIVATEKEYISEMPTY = "OperationDenied.CertificatePrivateKeyIsEmpty"
@@ -11138,6 +11603,7 @@ func NewModifyHostsCertificateResponse() (response *ModifyHostsCertificateRespon
 //  OPERATIONDENIED_HOSTSCLIENTCERTIFICATEINCONSISTENCY = "OperationDenied.HostsClientCertificateInconsistency"
 //  OPERATIONDENIED_HOSTSKEYLESSSERVERINCONSISTENCY = "OperationDenied.HostsKeylessServerInconsistency"
 //  OPERATIONDENIED_HOSTSUPSTREAMCERTIFICATEINCONSISTENCY = "OperationDenied.HostsUpstreamCertificateInconsistency"
+//  OPERATIONDENIED_HOSTSUPSTREAMCERTIFICATEVERIFYINCONSISTENCY = "OperationDenied.HostsUpstreamCertificateVerifyInconsistency"
 //  OPERATIONDENIED_KEYLESSCERTSWITCHTOFREECERTCONFLICT = "OperationDenied.KeylessCertSwitchToFreeCertConflict"
 //  OPERATIONDENIED_KEYLESSMODECERTIFICATEPRIVATEKEYNEEDEMPTY = "OperationDenied.KeylessModeCertificatePrivateKeyNeedEmpty"
 //  OPERATIONDENIED_NOTINKEYLESSWHITELIST = "OperationDenied.NotInKeylessWhiteList"
@@ -11169,6 +11635,7 @@ func ModifyHostsCertificate(c *Client, request *ModifyHostsCertificateRequest) (
 //  FAILEDOPERATION_INVALIDZONESTATUS = "FailedOperation.InvalidZoneStatus"
 //  FAILEDOPERATION_MODIFYFAILED = "FailedOperation.ModifyFailed"
 //  FAILEDOPERATION_UPSTREAMCLIENTCERTIFICATEHASEXPIRED = "FailedOperation.UpstreamClientCertificateHasExpired"
+//  FAILEDOPERATION_UPSTREAMVERIFYCUSTOMCACERTIFICATEHASEXPIRED = "FailedOperation.UpstreamVerifyCustomCACertificateHasExpired"
 //  INTERNALERROR_CONFIGLOCKED = "InternalError.ConfigLocked"
 //  INTERNALERROR_GETROLEERROR = "InternalError.GetRoleError"
 //  INTERNALERROR_PROXYSERVER = "InternalError.ProxyServer"
@@ -11188,19 +11655,27 @@ func ModifyHostsCertificate(c *Client, request *ModifyHostsCertificateRequest) (
 //  INVALIDPARAMETER_INVALIDHTTPSCERTINFO = "InvalidParameter.InvalidHttpsCertInfo"
 //  INVALIDPARAMETER_INVALIDHTTPSTLSVERSION = "InvalidParameter.InvalidHttpsTlsVersion"
 //  INVALIDPARAMETER_UPSTREAMCLIENTCERTCHECKERROR = "InvalidParameter.UpstreamClientCertCheckError"
+//  INVALIDPARAMETER_UPSTREAMVERIFYCERTCHECKERROR = "InvalidParameter.UpstreamVerifyCertCheckError"
+//  INVALIDPARAMETER_UPSTREAMVERIFYCUSTOMCACERTNOINFO = "InvalidParameter.UpstreamVerifyCustomCACertNoInfo"
 //  INVALIDPARAMETER_ZONEISGRAYPUBLISHING = "InvalidParameter.ZoneIsGrayPublishing"
 //  INVALIDPARAMETERVALUE_ALIASDOMAINNOTSUPPORTEDGEMTLS = "InvalidParameterValue.AliasDomainNotSupportEdgeMTLS"
 //  INVALIDPARAMETERVALUE_ALIASDOMAINNOTSUPPORTUPSTREAMMTLS = "InvalidParameterValue.AliasDomainNotSupportUpstreamMTLS"
+//  INVALIDPARAMETERVALUE_ALIASDOMAINNOTSUPPORTUPSTREAMVERIFY = "InvalidParameterValue.AliasDomainNotSupportUpstreamVerify"
 //  INVALIDPARAMETERVALUE_CERTIFICATEVERIFYCLIENTMUSTCA = "InvalidParameterValue.CertificateVerifyClientMustCa"
 //  INVALIDPARAMETERVALUE_CERTIFICATEVERIFYCLIENTNEEDCERT = "InvalidParameterValue.CertificateVerifyClientNeedCert"
 //  INVALIDPARAMETERVALUE_CERTIFICATEVERIFYUPSTREAMCLIENTMUSTRSAORECC = "InvalidParameterValue.CertificateVerifyUpstreamClientMustRSAorECC"
 //  INVALIDPARAMETERVALUE_CERTIFICATEVERIFYUPSTREAMCLIENTMUSTSVR = "InvalidParameterValue.CertificateVerifyUpstreamClientMustSVR"
 //  INVALIDPARAMETERVALUE_CERTIFICATEVERIFYUPSTREAMCLIENTNEEDCERT = "InvalidParameterValue.CertificateVerifyUpstreamClientNeedCert"
+//  INVALIDPARAMETERVALUE_CERTIFICATEVERIFYUPSTREAMVERIFYCUSTOMCAMUSTCA = "InvalidParameterValue.CertificateVerifyUpstreamVerifyCustomCAMustCA"
+//  INVALIDPARAMETERVALUE_CERTIFICATEVERIFYUPSTREAMVERIFYCUSTOMCAMUSTRSAORECC = "InvalidParameterValue.CertificateVerifyUpstreamVerifyCustomCAMustRSAorECC"
+//  INVALIDPARAMETERVALUE_CERTIFICATEVERIFYUPSTREAMVERIFYCUSTOMCANEEDCERT = "InvalidParameterValue.CertificateVerifyUpstreamVerifyCustomCANeedCert"
 //  INVALIDPARAMETERVALUE_CLIENTCERTINFOQUOTALIMIT = "InvalidParameterValue.ClientCertInfoQuotaLimit"
 //  INVALIDPARAMETERVALUE_INVALIDKEYLESSSERVERID = "InvalidParameterValue.InvalidKeylessServerId"
+//  INVALIDPARAMETERVALUE_OCDIRECTORIGINDOMAINNOTSUPPORTUPSTREAMVERIFY = "InvalidParameterValue.OCDirectOriginDomainNotSupportUpstreamVerify"
 //  INVALIDPARAMETERVALUE_SERVERCERTINFONEEDCONTAINRSAORECC = "InvalidParameterValue.ServerCertInfoNeedContainRSAorECC"
 //  INVALIDPARAMETERVALUE_SERVERCERTINFONEEDCONTAINSM2 = "InvalidParameterValue.ServerCertInfoNeedContainSM2"
 //  INVALIDPARAMETERVALUE_UPSTREAMCLIENTCERTINFOQUOTALIMIT = "InvalidParameterValue.UpstreamClientCertInfoQuotaLimit"
+//  INVALIDPARAMETERVALUE_UPSTREAMVERIFYCUSTOMCACERTINFOQUOTALIMIT = "InvalidParameterValue.UpstreamVerifyCustomCACertInfoQuotaLimit"
 //  LIMITEXCEEDED_RATELIMITEXCEEDED = "LimitExceeded.RateLimitExceeded"
 //  OPERATIONDENIED = "OperationDenied"
 //  OPERATIONDENIED_CERTIFICATEPRIVATEKEYISEMPTY = "OperationDenied.CertificatePrivateKeyIsEmpty"
@@ -11210,6 +11685,7 @@ func ModifyHostsCertificate(c *Client, request *ModifyHostsCertificateRequest) (
 //  OPERATIONDENIED_HOSTSCLIENTCERTIFICATEINCONSISTENCY = "OperationDenied.HostsClientCertificateInconsistency"
 //  OPERATIONDENIED_HOSTSKEYLESSSERVERINCONSISTENCY = "OperationDenied.HostsKeylessServerInconsistency"
 //  OPERATIONDENIED_HOSTSUPSTREAMCERTIFICATEINCONSISTENCY = "OperationDenied.HostsUpstreamCertificateInconsistency"
+//  OPERATIONDENIED_HOSTSUPSTREAMCERTIFICATEVERIFYINCONSISTENCY = "OperationDenied.HostsUpstreamCertificateVerifyInconsistency"
 //  OPERATIONDENIED_KEYLESSCERTSWITCHTOFREECERTCONFLICT = "OperationDenied.KeylessCertSwitchToFreeCertConflict"
 //  OPERATIONDENIED_KEYLESSMODECERTIFICATEPRIVATEKEYNEEDEMPTY = "OperationDenied.KeylessModeCertificatePrivateKeyNeedEmpty"
 //  OPERATIONDENIED_NOTINKEYLESSWHITELIST = "OperationDenied.NotInKeylessWhiteList"
@@ -12421,6 +12897,96 @@ func ModifyPlanWithContext(ctx context.Context, c *Client, request *ModifyPlanRe
     request.SetContext(ctx)
     
     response = NewModifyPlanResponse()
+    err = c.Send(request, response)
+    return
+}
+
+func NewModifyPrefetchOriginLimitRequest() (request *ModifyPrefetchOriginLimitRequest) {
+    request = &ModifyPrefetchOriginLimitRequest{
+        BaseRequest: &tchttp.BaseRequest{},
+    }
+    
+    request.Init().WithApiInfo("teo", APIVersion, "ModifyPrefetchOriginLimit")
+    
+    
+    return
+}
+
+func NewModifyPrefetchOriginLimitResponse() (response *ModifyPrefetchOriginLimitResponse) {
+    response = &ModifyPrefetchOriginLimitResponse{
+        BaseResponse: &tchttp.BaseResponse{},
+    } 
+    return
+
+}
+
+// ModifyPrefetchOriginLimit
+// 本接口用于配置回源限速限制，该功能白名单内测中。
+//
+// 可通过此接口创建、修改与删除预热回源限速限制，每个账号最多支持 100 条限制。
+//
+// 可能返回的错误码:
+//  FAILEDOPERATION = "FailedOperation"
+//  FAILEDOPERATION_CREATEPREFETCHORIGINLIMITFAILED = "FailedOperation.CreatePrefetchOriginLimitFailed"
+//  FAILEDOPERATION_PREFETCHORIGINLIMITCOUNTEXCEEDED = "FailedOperation.PrefetchOriginLimitCountExceeded"
+//  FAILEDOPERATION_PREFETCHORIGINLIMITNOTFOUND = "FailedOperation.PrefetchOriginLimitNotFound"
+//  INTERNALERROR_BACKENDERROR = "InternalError.BackendError"
+//  INTERNALERROR_DOMAINCONFIG = "InternalError.DomainConfig"
+//  INVALIDPARAMETER = "InvalidParameter"
+//  INVALIDPARAMETER_DOMAINAREANOTSUPPORTPREFETCHORIGINLIMITAREA = "InvalidParameter.DomainAreaNotSupportPrefetchOriginLimitArea"
+//  INVALIDPARAMETER_DOMAINNOTFOUND = "InvalidParameter.DomainNotFound"
+//  INVALIDPARAMETER_PREFETCHORIGINLIMITAREAINVALID = "InvalidParameter.PrefetchOriginLimitAreaInvalid"
+//  INVALIDPARAMETER_PREFETCHORIGINLIMITBANDWIDTHTOOLARGE = "InvalidParameter.PrefetchOriginLimitBandwidthTooLarge"
+//  INVALIDPARAMETER_PREFETCHORIGINLIMITBANDWIDTHTOOSMALL = "InvalidParameter.PrefetchOriginLimitBandwidthTooSmall"
+//  INVALIDPARAMETER_PREFETCHORIGINLIMITENABLEDINVALID = "InvalidParameter.PrefetchOriginLimitEnabledInvalid"
+//  INVALIDPARAMETER_ZONEAREANOTSUPPORTPREFETCHORIGINLIMITAREA = "InvalidParameter.ZoneAreaNotSupportPrefetchOriginLimitArea"
+//  OPERATIONDENIED_NOTINPREFETCHORIGINLIMITWHITELIST = "OperationDenied.NotInPrefetchOriginLimitWhiteList"
+//  RESOURCEINUSE_PREFETCHORIGINLIMITALREADYEXISTS = "ResourceInUse.PrefetchOriginLimitAlreadyExists"
+//  UNAUTHORIZEDOPERATION_CAMUNAUTHORIZED = "UnauthorizedOperation.CamUnauthorized"
+//  UNAUTHORIZEDOPERATION_NOPERMISSION = "UnauthorizedOperation.NoPermission"
+//  UNAUTHORIZEDOPERATION_UNKNOWN = "UnauthorizedOperation.Unknown"
+func ModifyPrefetchOriginLimit(c *Client, request *ModifyPrefetchOriginLimitRequest) (response *ModifyPrefetchOriginLimitResponse, err error) {
+    return ModifyPrefetchOriginLimitWithContext(context.Background(), c, request)
+}
+
+// ModifyPrefetchOriginLimit
+// 本接口用于配置回源限速限制，该功能白名单内测中。
+//
+// 可通过此接口创建、修改与删除预热回源限速限制，每个账号最多支持 100 条限制。
+//
+// 可能返回的错误码:
+//  FAILEDOPERATION = "FailedOperation"
+//  FAILEDOPERATION_CREATEPREFETCHORIGINLIMITFAILED = "FailedOperation.CreatePrefetchOriginLimitFailed"
+//  FAILEDOPERATION_PREFETCHORIGINLIMITCOUNTEXCEEDED = "FailedOperation.PrefetchOriginLimitCountExceeded"
+//  FAILEDOPERATION_PREFETCHORIGINLIMITNOTFOUND = "FailedOperation.PrefetchOriginLimitNotFound"
+//  INTERNALERROR_BACKENDERROR = "InternalError.BackendError"
+//  INTERNALERROR_DOMAINCONFIG = "InternalError.DomainConfig"
+//  INVALIDPARAMETER = "InvalidParameter"
+//  INVALIDPARAMETER_DOMAINAREANOTSUPPORTPREFETCHORIGINLIMITAREA = "InvalidParameter.DomainAreaNotSupportPrefetchOriginLimitArea"
+//  INVALIDPARAMETER_DOMAINNOTFOUND = "InvalidParameter.DomainNotFound"
+//  INVALIDPARAMETER_PREFETCHORIGINLIMITAREAINVALID = "InvalidParameter.PrefetchOriginLimitAreaInvalid"
+//  INVALIDPARAMETER_PREFETCHORIGINLIMITBANDWIDTHTOOLARGE = "InvalidParameter.PrefetchOriginLimitBandwidthTooLarge"
+//  INVALIDPARAMETER_PREFETCHORIGINLIMITBANDWIDTHTOOSMALL = "InvalidParameter.PrefetchOriginLimitBandwidthTooSmall"
+//  INVALIDPARAMETER_PREFETCHORIGINLIMITENABLEDINVALID = "InvalidParameter.PrefetchOriginLimitEnabledInvalid"
+//  INVALIDPARAMETER_ZONEAREANOTSUPPORTPREFETCHORIGINLIMITAREA = "InvalidParameter.ZoneAreaNotSupportPrefetchOriginLimitArea"
+//  OPERATIONDENIED_NOTINPREFETCHORIGINLIMITWHITELIST = "OperationDenied.NotInPrefetchOriginLimitWhiteList"
+//  RESOURCEINUSE_PREFETCHORIGINLIMITALREADYEXISTS = "ResourceInUse.PrefetchOriginLimitAlreadyExists"
+//  UNAUTHORIZEDOPERATION_CAMUNAUTHORIZED = "UnauthorizedOperation.CamUnauthorized"
+//  UNAUTHORIZEDOPERATION_NOPERMISSION = "UnauthorizedOperation.NoPermission"
+//  UNAUTHORIZEDOPERATION_UNKNOWN = "UnauthorizedOperation.Unknown"
+func ModifyPrefetchOriginLimitWithContext(ctx context.Context, c *Client, request *ModifyPrefetchOriginLimitRequest) (response *ModifyPrefetchOriginLimitResponse, err error) {
+    if request == nil {
+        request = NewModifyPrefetchOriginLimitRequest()
+    }
+    c.InitBaseRequest(&request.BaseRequest, "teo", APIVersion, "ModifyPrefetchOriginLimit")
+    
+    if c.GetCredential() == nil {
+        return nil, errors.New("ModifyPrefetchOriginLimit require credential")
+    }
+
+    request.SetContext(ctx)
+    
+    response = NewModifyPrefetchOriginLimitResponse()
     err = c.Send(request, response)
     return
 }
@@ -14021,6 +14587,82 @@ func ModifyZoneStatusWithContext(ctx context.Context, c *Client, request *Modify
     request.SetContext(ctx)
     
     response = NewModifyZoneStatusResponse()
+    err = c.Send(request, response)
+    return
+}
+
+func NewModifyZoneWorkModeRequest() (request *ModifyZoneWorkModeRequest) {
+    request = &ModifyZoneWorkModeRequest{
+        BaseRequest: &tchttp.BaseRequest{},
+    }
+    
+    request.Init().WithApiInfo("teo", APIVersion, "ModifyZoneWorkMode")
+    
+    
+    return
+}
+
+func NewModifyZoneWorkModeResponse() (response *ModifyZoneWorkModeResponse) {
+    response = &ModifyZoneWorkModeResponse{
+        BaseResponse: &tchttp.BaseResponse{},
+    } 
+    return
+
+}
+
+// ModifyZoneWorkMode
+// 本接口用于修改站点下各配置模块的工作模式。站点各配置模块可按照配置组维度开启「版本管理模式」或「即时生效模式」，详情请参考 [版本管理](https://cloud.tencent.com/document/product/1552/113690)。
+//
+// 可能返回的错误码:
+//  INVALIDPARAMETER_WORKMODEISSAME = "InvalidParameter.WorkModeIsSame"
+//  INVALIDPARAMETER_ZONENOTFOUND = "InvalidParameter.ZoneNotFound"
+//  INVALIDPARAMETERVALUE_OWNERSHIPVERIFICATIONNOTPASSED = "InvalidParameterValue.OwnershipVerificationNotPassed"
+//  OPERATIONDENIED_ALIASDOMAINNOTSUPPORT = "OperationDenied.AliasDomainNotSupport"
+//  OPERATIONDENIED_CONFIGLOCKED = "OperationDenied.ConfigLocked"
+//  OPERATIONDENIED_DOMAINSTATUSUNSTABLE = "OperationDenied.DomainStatusUnstable"
+//  OPERATIONDENIED_ERRZONEISALREADYPAUSED = "OperationDenied.ErrZoneIsAlreadyPaused"
+//  OPERATIONDENIED_NOTINVERSIONCONTROLWHITELIST = "OperationDenied.NotInVersionControlWhiteList"
+//  OPERATIONDENIED_OWNERSHIPVERIFICATIONNOTPASSED = "OperationDenied.OwnershipVerificationNotPassed"
+//  OPERATIONDENIED_PLANTYPEISWRONG = "OperationDenied.PlanTypeIsWrong"
+//  OPERATIONDENIED_VERSIONCONTROLLOCKED = "OperationDenied.VersionControlLocked"
+//  OPERATIONDENIED_VERSIONCONTROLNEEDNSSWITCHED = "OperationDenied.VersionControlNeedNSSwitched"
+//  RESOURCENOTFOUND_ZONENOTFOUND = "ResourceNotFound.ZoneNotFound"
+//  RESOURCEUNAVAILABLE_ZONENOTFOUND = "ResourceUnavailable.ZoneNotFound"
+func ModifyZoneWorkMode(c *Client, request *ModifyZoneWorkModeRequest) (response *ModifyZoneWorkModeResponse, err error) {
+    return ModifyZoneWorkModeWithContext(context.Background(), c, request)
+}
+
+// ModifyZoneWorkMode
+// 本接口用于修改站点下各配置模块的工作模式。站点各配置模块可按照配置组维度开启「版本管理模式」或「即时生效模式」，详情请参考 [版本管理](https://cloud.tencent.com/document/product/1552/113690)。
+//
+// 可能返回的错误码:
+//  INVALIDPARAMETER_WORKMODEISSAME = "InvalidParameter.WorkModeIsSame"
+//  INVALIDPARAMETER_ZONENOTFOUND = "InvalidParameter.ZoneNotFound"
+//  INVALIDPARAMETERVALUE_OWNERSHIPVERIFICATIONNOTPASSED = "InvalidParameterValue.OwnershipVerificationNotPassed"
+//  OPERATIONDENIED_ALIASDOMAINNOTSUPPORT = "OperationDenied.AliasDomainNotSupport"
+//  OPERATIONDENIED_CONFIGLOCKED = "OperationDenied.ConfigLocked"
+//  OPERATIONDENIED_DOMAINSTATUSUNSTABLE = "OperationDenied.DomainStatusUnstable"
+//  OPERATIONDENIED_ERRZONEISALREADYPAUSED = "OperationDenied.ErrZoneIsAlreadyPaused"
+//  OPERATIONDENIED_NOTINVERSIONCONTROLWHITELIST = "OperationDenied.NotInVersionControlWhiteList"
+//  OPERATIONDENIED_OWNERSHIPVERIFICATIONNOTPASSED = "OperationDenied.OwnershipVerificationNotPassed"
+//  OPERATIONDENIED_PLANTYPEISWRONG = "OperationDenied.PlanTypeIsWrong"
+//  OPERATIONDENIED_VERSIONCONTROLLOCKED = "OperationDenied.VersionControlLocked"
+//  OPERATIONDENIED_VERSIONCONTROLNEEDNSSWITCHED = "OperationDenied.VersionControlNeedNSSwitched"
+//  RESOURCENOTFOUND_ZONENOTFOUND = "ResourceNotFound.ZoneNotFound"
+//  RESOURCEUNAVAILABLE_ZONENOTFOUND = "ResourceUnavailable.ZoneNotFound"
+func ModifyZoneWorkModeWithContext(ctx context.Context, c *Client, request *ModifyZoneWorkModeRequest) (response *ModifyZoneWorkModeResponse, err error) {
+    if request == nil {
+        request = NewModifyZoneWorkModeRequest()
+    }
+    c.InitBaseRequest(&request.BaseRequest, "teo", APIVersion, "ModifyZoneWorkMode")
+    
+    if c.GetCredential() == nil {
+        return nil, errors.New("ModifyZoneWorkMode require credential")
+    }
+
+    request.SetContext(ctx)
+    
+    response = NewModifyZoneWorkModeResponse()
     err = c.Send(request, response)
     return
 }

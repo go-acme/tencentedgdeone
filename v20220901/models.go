@@ -138,7 +138,7 @@ type AccelerationDomain struct {
 }
 
 type AccelerationDomainCertificate struct {
-	// 配置服务端证书的模式，取值有： <ul><li>disable：不配置服务端证书；</li> <li>eofreecert：通过自动验证申请免费证书并部署。验证方式详见：[申请免费证书支持的验证方式](https://cloud.tencent.com/document/product/1552/90437) - 在 NS 或者 DNSPod 托管接入模式下，仅支持自动验证的方式申请免费证书。 - 当免费证书申请失败时会导致证书部署失败，您可以通过<a href = 'https://tcloud4api.woa.com/document/product/1657/927938?!preview&!document=1'>检查免费证书申请结果</a>接口获取申请失败原因。</li><li>eofreecert_manual：部署 DNS 委派验证或者文件验证申请的免费证书。在部署免费证书前，您需要触发<a href = 'https://tcloud4api.woa.com/document/product/1657/927322?!preview&!document=1'>申请免费证书</a>接口申请免费证书。在免费证书申请成功后，你可以通过该枚举值对免费证书进行部署；</li> <ul><li>注意：在对免费证书部署时，需要保证当前已存在申请成功的免费证书。您可以通过<a href = 'https://tcloud4api.woa.com/document/product/1657/927938?!preview&!document=1'>检查免费证书申请结果</a>接口检查当前是否已存在申请成功的免费证书。</li> </ul> <li>sslcert：配置 SSL 托管服务端证书。</li></ul>
+	// 配置服务端证书的模式，取值有： <ul><li>disable：不配置服务端证书；</li> <li>eofreecert：通过自动验证申请免费证书并部署。验证方式详见：[申请免费证书支持的验证方式](https://cloud.tencent.com/document/product/1552/90437) - 在 NS 或者 DNSPod 托管接入模式下，仅支持自动验证的方式申请免费证书。 - 当免费证书申请失败时会导致证书部署失败，您可以通过<a href = 'https://cloud.tencent.com/document/product/1552/124806'>检查免费证书申请结果</a>接口获取申请失败原因。</li><li>eofreecert_manual：部署 DNS 委派验证或者文件验证申请的免费证书。在部署免费证书前，您需要触发<a href = 'https://cloud.tencent.com/document/product/1552/124807'>申请免费证书</a>接口申请免费证书。在免费证书申请成功后，你可以通过该枚举值对免费证书进行部署；</li> <ul><li>注意：在对免费证书部署时，需要保证当前已存在申请成功的免费证书。您可以通过<a href = 'https://cloud.tencent.com/document/product/1552/124806'>检查免费证书申请结果</a>接口检查当前是否已存在申请成功的免费证书。</li> </ul> <li>sslcert：配置 SSL 托管服务端证书。</li></ul>
 	Mode *string `json:"Mode,omitnil,omitempty" name:"Mode"`
 
 	// 服务端证书列表，相关证书部署在 EO 的入口侧。
@@ -148,7 +148,7 @@ type AccelerationDomainCertificate struct {
 	// 在边缘双向认证场景下，该字段为客户端的 CA 证书，部署在 EO 节点内，用于 EO 节点认证客户端证书。
 	ClientCertInfo *MutualTLS `json:"ClientCertInfo,omitnil,omitempty" name:"ClientCertInfo"`
 
-	// 用于 EO 节点回源时携带的证书，源站启用双向认证握手时使用，用于源站认证客户端证书是否有效，确保请求来源于受信任的 EO 节点。
+	// 用于分别开启/关闭回源双向认证和源站证书校验。回源双向认证的证书用于 EO 回源时携带，源站可选择校验该证书用于确保请求来源于受信任的 EO 节点。源站证书校验开启时，证书配置用于 EO 节点校验源站证书是否可信。
 	UpstreamCertInfo *UpstreamCertInfo `json:"UpstreamCertInfo,omitnil,omitempty" name:"UpstreamCertInfo"`
 }
 
@@ -651,6 +651,86 @@ type ApplicationProxyRule struct {
 
 	// 规则标签。
 	RuleTag *string `json:"RuleTag,omitnil,omitempty" name:"RuleTag"`
+}
+
+// Predefined struct for user
+type ApplyFreeCertificateRequestParams struct {
+	// 站点ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 申请免费证书的目标域名。
+	Domain *string `json:"Domain,omitnil,omitempty" name:"Domain"`
+
+	// 申请免费证书的验证方式，详细验证方式说明参考[免费证书申请方式说明文档](https://cloud.tencent.com/document/product/1552/90437) ，相关取值有：
+	// <li>http_challenge：HTTP 访问文件验证方式，通过 HTTP 访问域名指定 URL 获取文件信息以完成免费证书申请验证；</li>
+	// <li>dns_challenge：DNS 委派验证方式，通过添加指定的主机记录解析指向 EdgeOne 以完成免费证书申请验证。</li>
+	// 注意：在触发本接口后，你需要根据返回的验证信息，完成验证内容配置。配置完成后，还需要通过<a href = 'https://cloud.tencent.com/document/product/1552/124806'>检查免费证书申请结果</a>接口进行验证，验证通过后，即可申请成功。在免费证书申请成功后，你可以调用<a href = 'https://cloud.tencent.com/document/product/1552/80764'>配置域名证书</a>接口为当前域名部署免费证书。
+	VerificationMethod *string `json:"VerificationMethod,omitnil,omitempty" name:"VerificationMethod"`
+}
+
+type ApplyFreeCertificateRequest struct {
+	*tchttp.BaseRequest
+	
+	// 站点ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 申请免费证书的目标域名。
+	Domain *string `json:"Domain,omitnil,omitempty" name:"Domain"`
+
+	// 申请免费证书的验证方式，详细验证方式说明参考[免费证书申请方式说明文档](https://cloud.tencent.com/document/product/1552/90437) ，相关取值有：
+	// <li>http_challenge：HTTP 访问文件验证方式，通过 HTTP 访问域名指定 URL 获取文件信息以完成免费证书申请验证；</li>
+	// <li>dns_challenge：DNS 委派验证方式，通过添加指定的主机记录解析指向 EdgeOne 以完成免费证书申请验证。</li>
+	// 注意：在触发本接口后，你需要根据返回的验证信息，完成验证内容配置。配置完成后，还需要通过<a href = 'https://cloud.tencent.com/document/product/1552/124806'>检查免费证书申请结果</a>接口进行验证，验证通过后，即可申请成功。在免费证书申请成功后，你可以调用<a href = 'https://cloud.tencent.com/document/product/1552/80764'>配置域名证书</a>接口为当前域名部署免费证书。
+	VerificationMethod *string `json:"VerificationMethod,omitnil,omitempty" name:"VerificationMethod"`
+}
+
+func (r *ApplyFreeCertificateRequest) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *ApplyFreeCertificateRequest) FromJsonString(s string) error {
+	f := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(s), &f); err != nil {
+		return err
+	}
+	delete(f, "ZoneId")
+	delete(f, "Domain")
+	delete(f, "VerificationMethod")
+	if len(f) > 0 {
+		return tcerr.NewTencentCloudSDKError("ClientError.BuildRequestError", "ApplyFreeCertificateRequest has unknown keys!", "")
+	}
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type ApplyFreeCertificateResponseParams struct {
+	// 当 VerificationMethod 为 dns_challenge 时，域名申请免费证书的相关验证信息。
+	DnsVerification *DnsVerification `json:"DnsVerification,omitnil,omitempty" name:"DnsVerification"`
+
+	// 当 VerificationMethod 为 http_challenge 时，域名申请免费证书的相关验证信息。
+	FileVerification *FileVerification `json:"FileVerification,omitnil,omitempty" name:"FileVerification"`
+
+	// 唯一请求 ID，由服务端生成，每次请求都会返回（若请求因其他原因未能抵达服务端，则该次请求不会获得 RequestId）。定位问题时需要提供该次请求的 RequestId。
+	RequestId *string `json:"RequestId,omitnil,omitempty" name:"RequestId"`
+}
+
+type ApplyFreeCertificateResponse struct {
+	*tchttp.BaseResponse
+	Response *ApplyFreeCertificateResponseParams `json:"Response"`
+}
+
+func (r *ApplyFreeCertificateResponse) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *ApplyFreeCertificateResponse) FromJsonString(s string) error {
+	return json.Unmarshal([]byte(s), &r)
 }
 
 type AscriptionInfo struct {
@@ -1623,6 +1703,77 @@ func (r *CheckCnameStatusResponse) FromJsonString(s string) error {
 	return json.Unmarshal([]byte(s), &r)
 }
 
+// Predefined struct for user
+type CheckFreeCertificateVerificationRequestParams struct {
+	// 站点 ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 加速域名，该域名为[申请免费证书](https://cloud.tencent.com/document/product/1552/124807)时使用的域名。
+	Domain *string `json:"Domain,omitnil,omitempty" name:"Domain"`
+}
+
+type CheckFreeCertificateVerificationRequest struct {
+	*tchttp.BaseRequest
+	
+	// 站点 ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 加速域名，该域名为[申请免费证书](https://cloud.tencent.com/document/product/1552/124807)时使用的域名。
+	Domain *string `json:"Domain,omitnil,omitempty" name:"Domain"`
+}
+
+func (r *CheckFreeCertificateVerificationRequest) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *CheckFreeCertificateVerificationRequest) FromJsonString(s string) error {
+	f := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(s), &f); err != nil {
+		return err
+	}
+	delete(f, "ZoneId")
+	delete(f, "Domain")
+	if len(f) > 0 {
+		return tcerr.NewTencentCloudSDKError("ClientError.BuildRequestError", "CheckFreeCertificateVerificationRequest has unknown keys!", "")
+	}
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type CheckFreeCertificateVerificationResponseParams struct {
+	// 免费证书申请成功时，该证书颁发给的域名。
+	// 注意：一个域名只允许申请一本免费证书， 如果已经有泛域名申请了免费证书的情况下，其子域名会匹配使用该泛域名证书。
+	CommonName *string `json:"CommonName,omitnil,omitempty" name:"CommonName"`
+
+	// 免费证书申请成功时，该证书使用的签名算法，当前仅支持 RSA 2048。
+	SignatureAlgorithm *string `json:"SignatureAlgorithm,omitnil,omitempty" name:"SignatureAlgorithm"`
+
+	// 免费证书申请成功时，该证书的过期时间。时间为世界标准时间（UTC）， 遵循 ISO 8601 标准的日期和时间格式。
+	ExpireTime *string `json:"ExpireTime,omitnil,omitempty" name:"ExpireTime"`
+
+	// 唯一请求 ID，由服务端生成，每次请求都会返回（若请求因其他原因未能抵达服务端，则该次请求不会获得 RequestId）。定位问题时需要提供该次请求的 RequestId。
+	RequestId *string `json:"RequestId,omitnil,omitempty" name:"RequestId"`
+}
+
+type CheckFreeCertificateVerificationResponse struct {
+	*tchttp.BaseResponse
+	Response *CheckFreeCertificateVerificationResponseParams `json:"Response"`
+}
+
+func (r *CheckFreeCertificateVerificationResponse) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *CheckFreeCertificateVerificationResponse) FromJsonString(s string) error {
+	return json.Unmarshal([]byte(s), &r)
+}
+
 type CheckRegionHealthStatus struct {
 	// 健康检查区域，ISO-3166-1 两位字母代码。
 	Region *string `json:"Region,omitnil,omitempty" name:"Region"`
@@ -1844,6 +1995,14 @@ type ConfigGroupVersionInfo struct {
 
 	// 版本创建时间。时间为世界标准时间（UTC）， 遵循 ISO 8601 标准的日期和时间格式。
 	CreateTime *string `json:"CreateTime,omitnil,omitempty" name:"CreateTime"`
+}
+
+type ConfigGroupWorkModeInfo struct {
+	// 配置组类型，可选项如下：<li>l7_acceleration: 七层加速配置组；</li><li>edge_functions: 边缘函数配置组。</li>
+	ConfigGroupType *string `json:"ConfigGroupType,omitnil,omitempty" name:"ConfigGroupType"`
+
+	// 工作模式，可选项如下：<li>immediate_effect: 即时生效模式；</li><li>version_control: 版本管理模式。</li>
+	WorkMode *string `json:"WorkMode,omitnil,omitempty" name:"WorkMode"`
 }
 
 // Predefined struct for user
@@ -3231,7 +3390,6 @@ type CreateL4ProxyRequestParams struct {
 	// 是否开启 IPv6 访问，不填写时默认为 off。该配置仅在部分加速区域和安全防护配置下支持开启，详情请参考 [新建四层代理实例](https://cloud.tencent.com/document/product/1552/90025) 。取值为：
 	// <li>on：开启；</li>
 	// <li>off：关闭。</li>
-	// 
 	Ipv6 *string `json:"Ipv6,omitnil,omitempty" name:"Ipv6"`
 
 	// 是否开启固定 IP，不填写时默认为 off。该配置仅在部分加速区域和安全防护配置下支持开启，详情请参考 [新建四层代理实例](https://cloud.tencent.com/document/product/1552/90025) 。取值为：
@@ -3245,6 +3403,9 @@ type CreateL4ProxyRequestParams struct {
 	AccelerateMainland *string `json:"AccelerateMainland,omitnil,omitempty" name:"AccelerateMainland"`
 
 	// L3/L4 DDoS 防护配置，不填写时默认使用平台默认防护选项。详情参考 [独立 DDoS 防护](https://cloud.tencent.com/document/product/1552/95994)。
+	// 本字段已废弃，请使用 DDosProtectionId 字段指定关联的DDoS防护配置。
+	//
+	// Deprecated: DDosProtectionConfig is deprecated.
 	DDosProtectionConfig *DDosProtectionConfig `json:"DDosProtectionConfig,omitnil,omitempty" name:"DDosProtectionConfig"`
 }
 
@@ -3266,7 +3427,6 @@ type CreateL4ProxyRequest struct {
 	// 是否开启 IPv6 访问，不填写时默认为 off。该配置仅在部分加速区域和安全防护配置下支持开启，详情请参考 [新建四层代理实例](https://cloud.tencent.com/document/product/1552/90025) 。取值为：
 	// <li>on：开启；</li>
 	// <li>off：关闭。</li>
-	// 
 	Ipv6 *string `json:"Ipv6,omitnil,omitempty" name:"Ipv6"`
 
 	// 是否开启固定 IP，不填写时默认为 off。该配置仅在部分加速区域和安全防护配置下支持开启，详情请参考 [新建四层代理实例](https://cloud.tencent.com/document/product/1552/90025) 。取值为：
@@ -3280,6 +3440,7 @@ type CreateL4ProxyRequest struct {
 	AccelerateMainland *string `json:"AccelerateMainland,omitnil,omitempty" name:"AccelerateMainland"`
 
 	// L3/L4 DDoS 防护配置，不填写时默认使用平台默认防护选项。详情参考 [独立 DDoS 防护](https://cloud.tencent.com/document/product/1552/95994)。
+	// 本字段已废弃，请使用 DDosProtectionId 字段指定关联的DDoS防护配置。
 	DDosProtectionConfig *DDosProtectionConfig `json:"DDosProtectionConfig,omitnil,omitempty" name:"DDosProtectionConfig"`
 }
 
@@ -4100,29 +4261,38 @@ type CreatePrefetchTaskRequestParams struct {
 	// 若您希望快速提交不同站点下的 Targets Url，可以将其填写为 *，但前提是调用该 API 的账号必须具备主账号下全部站点资源的权限。
 	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
 
-	// 要预热的资源列表，每个元素格式类似如下:
-	// http://www.example.com/example.txt。参数值当前必填。
+	// 要预热的资源列表，必填。每个元素格式类似如下:
+	// http://www.example.com/example.txt。
 	// 注意：提交任务数受计费套餐配额限制，请查看 [EO计费套餐](https://cloud.tencent.com/document/product/1552/77380)。
 	Targets []*string `json:"Targets,omitnil,omitempty" name:"Targets"`
+
+	// 预热模式，取值有：
+	// <li>default：默认模式，即预热到中间层；</li>
+	// <li>edge：边缘预热模式，即预热到边缘和中间层。</li>不填写时，默认值为 default。
+	// 注意事项：
+	// 1.预热至边缘产生的边缘层流量，会计入计费流量；
+	// 2.边缘预热默认分配单独的预热额度 1000 条/天，不消费常规预热额度。
+	// 说明：
+	// 该参数为白名单功能，如有需要，请联系腾讯云工程师处理。
+	Mode *string `json:"Mode,omitnil,omitempty" name:"Mode"`
 
 	// 是否对url进行encode，若内容含有非 ASCII 字符集的字符，请开启此开关进行编码转换（编码规则遵循 RFC3986）。
 	//
 	// Deprecated: EncodeUrl is deprecated.
 	EncodeUrl *bool `json:"EncodeUrl,omitnil,omitempty" name:"EncodeUrl"`
 
-	// 附带的http头部信息。
+	// 若需要携带 HTTP 头部信息预热，可入参该参数，否则放空即可。
 	Headers []*Header `json:"Headers,omitnil,omitempty" name:"Headers"`
 
 	// 媒体分片预热控制，取值有：
 	// <li>on：开启分片预热，预热描述文件，并递归解析描述文件分片进行预热；</li>
 	// <li>off：仅预热提交的描述文件；</li>不填写时，默认值为 off。
-	// 
 	// 注意事项：
 	// 1. 支持的描述文件为 M3U8，对应分片为 TS；
 	// 2. 要求描述文件能正常请求，并按行业标准描述分片路径；
 	// 3. 递归解析深度不超过 3 层；
 	// 4. 解析获取的分片会正常累加每日预热用量，当用量超出配额时，会静默处理，不再执行预热。
-	// 
+	// 说明：
 	// 该参数为白名单功能，如有需要，请联系腾讯云工程师处理。
 	PrefetchMediaSegments *string `json:"PrefetchMediaSegments,omitnil,omitempty" name:"PrefetchMediaSegments"`
 }
@@ -4134,27 +4304,36 @@ type CreatePrefetchTaskRequest struct {
 	// 若您希望快速提交不同站点下的 Targets Url，可以将其填写为 *，但前提是调用该 API 的账号必须具备主账号下全部站点资源的权限。
 	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
 
-	// 要预热的资源列表，每个元素格式类似如下:
-	// http://www.example.com/example.txt。参数值当前必填。
+	// 要预热的资源列表，必填。每个元素格式类似如下:
+	// http://www.example.com/example.txt。
 	// 注意：提交任务数受计费套餐配额限制，请查看 [EO计费套餐](https://cloud.tencent.com/document/product/1552/77380)。
 	Targets []*string `json:"Targets,omitnil,omitempty" name:"Targets"`
+
+	// 预热模式，取值有：
+	// <li>default：默认模式，即预热到中间层；</li>
+	// <li>edge：边缘预热模式，即预热到边缘和中间层。</li>不填写时，默认值为 default。
+	// 注意事项：
+	// 1.预热至边缘产生的边缘层流量，会计入计费流量；
+	// 2.边缘预热默认分配单独的预热额度 1000 条/天，不消费常规预热额度。
+	// 说明：
+	// 该参数为白名单功能，如有需要，请联系腾讯云工程师处理。
+	Mode *string `json:"Mode,omitnil,omitempty" name:"Mode"`
 
 	// 是否对url进行encode，若内容含有非 ASCII 字符集的字符，请开启此开关进行编码转换（编码规则遵循 RFC3986）。
 	EncodeUrl *bool `json:"EncodeUrl,omitnil,omitempty" name:"EncodeUrl"`
 
-	// 附带的http头部信息。
+	// 若需要携带 HTTP 头部信息预热，可入参该参数，否则放空即可。
 	Headers []*Header `json:"Headers,omitnil,omitempty" name:"Headers"`
 
 	// 媒体分片预热控制，取值有：
 	// <li>on：开启分片预热，预热描述文件，并递归解析描述文件分片进行预热；</li>
 	// <li>off：仅预热提交的描述文件；</li>不填写时，默认值为 off。
-	// 
 	// 注意事项：
 	// 1. 支持的描述文件为 M3U8，对应分片为 TS；
 	// 2. 要求描述文件能正常请求，并按行业标准描述分片路径；
 	// 3. 递归解析深度不超过 3 层；
 	// 4. 解析获取的分片会正常累加每日预热用量，当用量超出配额时，会静默处理，不再执行预热。
-	// 
+	// 说明：
 	// 该参数为白名单功能，如有需要，请联系腾讯云工程师处理。
 	PrefetchMediaSegments *string `json:"PrefetchMediaSegments,omitnil,omitempty" name:"PrefetchMediaSegments"`
 }
@@ -4173,6 +4352,7 @@ func (r *CreatePrefetchTaskRequest) FromJsonString(s string) error {
 	}
 	delete(f, "ZoneId")
 	delete(f, "Targets")
+	delete(f, "Mode")
 	delete(f, "EncodeUrl")
 	delete(f, "Headers")
 	delete(f, "PrefetchMediaSegments")
@@ -4335,6 +4515,7 @@ type CreateRealtimeLogDeliveryTaskRequestParams struct {
 	// <li>cls: 推送到腾讯云 CLS；</li>
 	// <li>custom_endpoint：推送到自定义 HTTP(S) 地址；</li>
 	// <li>s3：推送到 AWS S3 兼容存储桶地址；</li>
+	// <li>log_analysis：推送到 EdgeOne 日志分析，该任务类型仅支持“站点加速日志”这一数据投递类型。</li>
 	TaskType *string `json:"TaskType,omitnil,omitempty" name:"TaskType"`
 
 	// 实时日志投递任务对应的实体列表。取值示例如下：
@@ -4375,7 +4556,7 @@ type CreateRealtimeLogDeliveryTaskRequestParams struct {
 
 	// 日志投递的输出格式。不填表示为默认格式，默认格式逻辑如下：
 	// <li>当 TaskType 取值为 custom_endpoint 时，默认格式为多个 JSON 对象组成的数组，每个 JSON 对象为一条日志；</li>
-	// <li>当 TaskType 取值为 s3 时，默认格式为 JSON Lines；</li>特别地，当 TaskType 取值为 cls 时，LogFormat.FormatType 的值只能为 json，且 LogFormat 中其他参数将被忽略，建议不传 LogFormat。
+	// <li>当 TaskType 取值为 s3 时，默认格式为 JSON Lines；</li>特别地，当 TaskType 取值为 cls 或 log_analysis 时，LogFormat.FormatType 的值只能为 json，且 LogFormat 中其他参数将被忽略，建议不传 LogFormat。
 	LogFormat *LogFormat `json:"LogFormat,omitnil,omitempty" name:"LogFormat"`
 
 	// CLS 的配置信息。当 TaskType 取值为 cls 时，该参数必填。
@@ -4401,6 +4582,7 @@ type CreateRealtimeLogDeliveryTaskRequest struct {
 	// <li>cls: 推送到腾讯云 CLS；</li>
 	// <li>custom_endpoint：推送到自定义 HTTP(S) 地址；</li>
 	// <li>s3：推送到 AWS S3 兼容存储桶地址；</li>
+	// <li>log_analysis：推送到 EdgeOne 日志分析，该任务类型仅支持“站点加速日志”这一数据投递类型。</li>
 	TaskType *string `json:"TaskType,omitnil,omitempty" name:"TaskType"`
 
 	// 实时日志投递任务对应的实体列表。取值示例如下：
@@ -4441,7 +4623,7 @@ type CreateRealtimeLogDeliveryTaskRequest struct {
 
 	// 日志投递的输出格式。不填表示为默认格式，默认格式逻辑如下：
 	// <li>当 TaskType 取值为 custom_endpoint 时，默认格式为多个 JSON 对象组成的数组，每个 JSON 对象为一条日志；</li>
-	// <li>当 TaskType 取值为 s3 时，默认格式为 JSON Lines；</li>特别地，当 TaskType 取值为 cls 时，LogFormat.FormatType 的值只能为 json，且 LogFormat 中其他参数将被忽略，建议不传 LogFormat。
+	// <li>当 TaskType 取值为 s3 时，默认格式为 JSON Lines；</li>特别地，当 TaskType 取值为 cls 或 log_analysis 时，LogFormat.FormatType 的值只能为 json，且 LogFormat 中其他参数将被忽略，建议不传 LogFormat。
 	LogFormat *LogFormat `json:"LogFormat,omitnil,omitempty" name:"LogFormat"`
 
 	// CLS 的配置信息。当 TaskType 取值为 cls 时，该参数必填。
@@ -9379,7 +9561,7 @@ type DescribeJustInTimeTranscodeTemplatesRequestParams struct {
 	// 站点ID。
 	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
 
-	// 过滤条件，Filters 的上限为 20，Filters.Values 的上限为 20。该参数不填写时，默认返回当前 ZoneId 下有权限的即时转码模板。详细的过滤条件如下：<li>template-name：按照模版名批量进行过滤。例如：mytemplate；</li><li>template-type：按照模板类型批量进行过滤。例如：preset 或 custom。</li><li>template-id：按照模板 ID 批量进行过滤。例如：C1LZ7982VgTpYhJ7M。</li>默认为空。
+	// 过滤条件，Filters 的上限为 20，Filters.Values 的上限为 20。该参数不填写时，默认返回当前 ZoneId 下有权限的即时转码模板。详细的过滤条件如下：<li>template-name：按照模板名批量进行过滤。例如：mytemplate；</li><li>template-type：按照模板类型批量进行过滤。例如：preset 或 custom。</li><li>template-id：按照模板 ID 批量进行过滤。例如：C1LZ7982VgTpYhJ7M。</li>默认为空。
 	Filters []*Filter `json:"Filters,omitnil,omitempty" name:"Filters"`
 
 	// 排序字段，取值有：<li>createTime：模板创建时间。</li>默认值为：createTime。
@@ -9401,7 +9583,7 @@ type DescribeJustInTimeTranscodeTemplatesRequest struct {
 	// 站点ID。
 	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
 
-	// 过滤条件，Filters 的上限为 20，Filters.Values 的上限为 20。该参数不填写时，默认返回当前 ZoneId 下有权限的即时转码模板。详细的过滤条件如下：<li>template-name：按照模版名批量进行过滤。例如：mytemplate；</li><li>template-type：按照模板类型批量进行过滤。例如：preset 或 custom。</li><li>template-id：按照模板 ID 批量进行过滤。例如：C1LZ7982VgTpYhJ7M。</li>默认为空。
+	// 过滤条件，Filters 的上限为 20，Filters.Values 的上限为 20。该参数不填写时，默认返回当前 ZoneId 下有权限的即时转码模板。详细的过滤条件如下：<li>template-name：按照模板名批量进行过滤。例如：mytemplate；</li><li>template-type：按照模板类型批量进行过滤。例如：preset 或 custom。</li><li>template-id：按照模板 ID 批量进行过滤。例如：C1LZ7982VgTpYhJ7M。</li>默认为空。
 	Filters []*Filter `json:"Filters,omitnil,omitempty" name:"Filters"`
 
 	// 排序字段，取值有：<li>createTime：模板创建时间。</li>默认值为：createTime。
@@ -10823,6 +11005,91 @@ func (r *DescribePlansResponse) FromJsonString(s string) error {
 }
 
 // Predefined struct for user
+type DescribePrefetchOriginLimitRequestParams struct {
+	// 站点ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 分页查询偏移量，默认为 0。
+	Offset *int64 `json:"Offset,omitnil,omitempty" name:"Offset"`
+
+	// 分页查询限制数目，默认值：20，上限：100。
+	Limit *int64 `json:"Limit,omitnil,omitempty" name:"Limit"`
+
+	// 过滤条件，Filters.Values 的上限为 20。详细的过滤条件如下：
+	// <li>domain-name：按照域名过滤。domain-name 形如：www.qq.com，不支持模糊查询；</li>
+	// <li>area：按照限制加速区域过滤，不支持模糊查询。可选项：<br> Overseas：全球可用区（不含中国大陆）；<br> MainlandChina：中国大陆可用区。</li>
+	Filters []*Filter `json:"Filters,omitnil,omitempty" name:"Filters"`
+}
+
+type DescribePrefetchOriginLimitRequest struct {
+	*tchttp.BaseRequest
+	
+	// 站点ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 分页查询偏移量，默认为 0。
+	Offset *int64 `json:"Offset,omitnil,omitempty" name:"Offset"`
+
+	// 分页查询限制数目，默认值：20，上限：100。
+	Limit *int64 `json:"Limit,omitnil,omitempty" name:"Limit"`
+
+	// 过滤条件，Filters.Values 的上限为 20。详细的过滤条件如下：
+	// <li>domain-name：按照域名过滤。domain-name 形如：www.qq.com，不支持模糊查询；</li>
+	// <li>area：按照限制加速区域过滤，不支持模糊查询。可选项：<br> Overseas：全球可用区（不含中国大陆）；<br> MainlandChina：中国大陆可用区。</li>
+	Filters []*Filter `json:"Filters,omitnil,omitempty" name:"Filters"`
+}
+
+func (r *DescribePrefetchOriginLimitRequest) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *DescribePrefetchOriginLimitRequest) FromJsonString(s string) error {
+	f := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(s), &f); err != nil {
+		return err
+	}
+	delete(f, "ZoneId")
+	delete(f, "Offset")
+	delete(f, "Limit")
+	delete(f, "Filters")
+	if len(f) > 0 {
+		return tcerr.NewTencentCloudSDKError("ClientError.BuildRequestError", "DescribePrefetchOriginLimitRequest has unknown keys!", "")
+	}
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type DescribePrefetchOriginLimitResponseParams struct {
+	// 回源限速限制总数。
+	TotalCount *int64 `json:"TotalCount,omitnil,omitempty" name:"TotalCount"`
+
+	// 回源限速限制详情List。
+	Limits []*PrefetchOriginLimit `json:"Limits,omitnil,omitempty" name:"Limits"`
+
+	// 唯一请求 ID，由服务端生成，每次请求都会返回（若请求因其他原因未能抵达服务端，则该次请求不会获得 RequestId）。定位问题时需要提供该次请求的 RequestId。
+	RequestId *string `json:"RequestId,omitnil,omitempty" name:"RequestId"`
+}
+
+type DescribePrefetchOriginLimitResponse struct {
+	*tchttp.BaseResponse
+	Response *DescribePrefetchOriginLimitResponseParams `json:"Response"`
+}
+
+func (r *DescribePrefetchOriginLimitResponse) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *DescribePrefetchOriginLimitResponse) FromJsonString(s string) error {
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
 type DescribePrefetchTasksRequestParams struct {
 	// 站点ID。此参数将于2024年05月30日后由可选改为必填，详见公告：[【腾讯云 EdgeOne】云 API 变更通知](https://cloud.tencent.com/document/product/1552/104902)。
 	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
@@ -11037,7 +11304,7 @@ type DescribeRealtimeLogDeliveryTasksRequestParams struct {
 	// <li>task-id：按照实时日志投递任务 ID进行过滤。不支持模糊查询。</li>
 	// <li>task-name：按照实时日志投递任务名称进行过滤。支持模糊查询，使用模糊查询时，仅支持填写一个实时日志投递任务名称。</li>
 	// <li>entity-list：按照实时日志投递任务对应的实体进行过滤。不支持模糊查询。示例值：domain.example.com 或者 sid-2s69eb5wcms7。</li>
-	// <li>task-type：按照实时日志投递任务类型进行过滤。不支持模糊查询。可选项如下：<br>   cls: 推送到腾讯云 CLS；<br>   custom_endpoint：推送到自定义 HTTP(S) 地址；<br>   s3：推送到 AWS S3 兼容存储桶地址。</li>
+	// <li>task-type：按照实时日志投递任务类型进行过滤。不支持模糊查询。可选项如下：<br>   cls: 推送到腾讯云 CLS；<br>   custom_endpoint：推送到自定义 HTTP(S) 地址；<br>   s3：推送到 AWS S3 兼容存储桶地址；<br>   log_analysis：推送到 EdgeOne 日志分析。</li>
 	Filters []*AdvancedFilter `json:"Filters,omitnil,omitempty" name:"Filters"`
 }
 
@@ -11057,7 +11324,7 @@ type DescribeRealtimeLogDeliveryTasksRequest struct {
 	// <li>task-id：按照实时日志投递任务 ID进行过滤。不支持模糊查询。</li>
 	// <li>task-name：按照实时日志投递任务名称进行过滤。支持模糊查询，使用模糊查询时，仅支持填写一个实时日志投递任务名称。</li>
 	// <li>entity-list：按照实时日志投递任务对应的实体进行过滤。不支持模糊查询。示例值：domain.example.com 或者 sid-2s69eb5wcms7。</li>
-	// <li>task-type：按照实时日志投递任务类型进行过滤。不支持模糊查询。可选项如下：<br>   cls: 推送到腾讯云 CLS；<br>   custom_endpoint：推送到自定义 HTTP(S) 地址；<br>   s3：推送到 AWS S3 兼容存储桶地址。</li>
+	// <li>task-type：按照实时日志投递任务类型进行过滤。不支持模糊查询。可选项如下：<br>   cls: 推送到腾讯云 CLS；<br>   custom_endpoint：推送到自定义 HTTP(S) 地址；<br>   s3：推送到 AWS S3 兼容存储桶地址；<br>   log_analysis：推送到 EdgeOne 日志分析。</li>
 	Filters []*AdvancedFilter `json:"Filters,omitnil,omitempty" name:"Filters"`
 }
 
@@ -12304,65 +12571,69 @@ func (r *DescribeTimingL7CacheDataResponse) FromJsonString(s string) error {
 
 // Predefined struct for user
 type DescribeTimingL7OriginPullDataRequestParams struct {
+	// 站点 ID 集合，此参数必填。最多传入 100 个站点 ID。若需查询腾讯云主账号下所有站点数据，请用 `*` 代替，查询账号级别数据需具备本接口全部站点资源权限。
+	ZoneIds []*string `json:"ZoneIds,omitnil,omitempty" name:"ZoneIds"`
+
+	// 指标列表，取值有:
+	// <ul><li>l7Flow_outFlux_hy: EdgeOne 节点至源站方向的请求流量，单位：Byte；</li>
+	// <li>l7Flow_outBandwidth_hy: EdgeOne 节点至源站方向的请求带宽，单位：bps；</li>
+	// <li>l7Flow_request_hy: EdgeOne 节点至源站方向的请求数，单位：次。</li>
+	// <li>l7Flow_inFlux_hy: 源站至 EdgeOne 节点方向的响应流量，单位：Byte；</li>
+	// <li>l7Flow_inBandwidth_hy: 源站至 EdgeOne 节点方向的响应带宽，单位：bps。</li></ul>
+	MetricNames []*string `json:"MetricNames,omitnil,omitempty" name:"MetricNames"`
+
 	// 开始时间。
 	StartTime *string `json:"StartTime,omitnil,omitempty" name:"StartTime"`
 
 	// 结束时间。查询时间范围（`EndTime` - `StartTime`）需小于等于 31 天。
 	EndTime *string `json:"EndTime,omitnil,omitempty" name:"EndTime"`
 
-	// 指标列表，取值有:
-	// <li>l7Flow_outFlux_hy: EdgeOne 节点至源站方向的请求流量，单位：Byte；</li>
-	// <li>l7Flow_outBandwidth_hy: EdgeOne 节点至源站方向的请求带宽，单位：bps；</li>
-	// <li>l7Flow_request_hy: EdgeOne 节点至源站方向的请求数，单位：次。</li>
-	// <li>l7Flow_inFlux_hy: 源站至 EdgeOne 节点方向的响应流量，单位：Byte；</li>
-	// <li>l7Flow_inBandwidth_hy: 源站至 EdgeOne 节点方向的响应带宽，单位：bps；</li>
-	MetricNames []*string `json:"MetricNames,omitnil,omitempty" name:"MetricNames"`
-
-	// 站点 ID 集合，此参数必填。最多传入 100 个站点 ID。若需查询腾讯云主账号下所有站点数据，请用 `*` 代替，查询账号级别数据需具备本接口全部站点资源权限。
-	ZoneIds []*string `json:"ZoneIds,omitnil,omitempty" name:"ZoneIds"`
-
 	// 查询时间粒度，取值有：
-	// <li>min: 1分钟；</li>
-	// <li>5min: 5分钟；</li>
-	// <li>hour: 1小时；</li>
-	// <li>day: 1天。</li>不填将根据开始时间跟结束时间的间距自动推算粒度，具体为：2 小时范围内以 min 粒度查询，2 天范围内以 5min 粒度查询，7 天范围内以 hour 粒度查询，超过 7 天以 day 粒度查询。
+	// <ul><li>min: 1分钟；</li><li>5min: 5分钟；</li><li>hour: 1小时；</li><li>day: 1天。</li></ul>不填将根据开始时间跟结束时间的间距自动推算粒度，具体为：2 小时范围内以 min 粒度查询，2 天范围内以 5min 粒度查询，7 天范围内以 hour 粒度查询，超过 7 天以 day 粒度查询。
 	Interval *string `json:"Interval,omitnil,omitempty" name:"Interval"`
 
 	// 过滤条件，详细的过滤条件如下：
-	// <li>domain：客户端请求的域名。若按泛域名接入 EdgeOne，则数据中记录为泛域名，而不是具体域名。</li>
+	// <ul><li><strong>domain</strong>：客户端请求的域名。若按泛域名接入 EdgeOne，则数据中记录为泛域名，而不是具体域名。</li><li><strong>originStatusCode</strong>：回源状态码，仅当 <code>MetricNames = ["l7Flow_request_hy"]</code> 时支持本过滤项。<br>对应的 Value 可选项如下：<ul><li><code>1xx</code>：1xx 类型的状态码；</li><li><code>2xx</code>：2xx 类型的状态码；</li><li><code>3xx</code>：3xx 类型的状态码；</li><li><code>4xx</code>：4xx 类型的状态码；</li><li><code>5xx</code>：5xx 类型的状态码；</li><li>在 <code>[0, 600)</code> 范围内的整数（不包括 600）。</li></ul></li></ul>
+	// **注意**：当 <code>DimensionName</code>  不为空时，仅支持 <code>equals</code> 运算符。
 	Filters []*QueryCondition `json:"Filters,omitnil,omitempty" name:"Filters"`
+
+	// <p>查询维度名称，取值有：</p><ul><li><strong>domain</strong>：客户端请求的域名。若按泛域名接入 EdgeOne，则数据中记录为泛域名。<br>使用 domain 维度时必须在 <code>Filters</code> 中包含 <code>domain</code> 过滤项，指定总数不超过 100 个需要查询的域名列表；</li><li><strong>origin-status-code</strong>：回源状态码，如 200、404，<br>仅当 <code>MetricNames = ["l7Flow_request_hy"]</code> 时支持本维度；</li><li><strong>origin-status-code-category</strong>：回源状态码类别，如 2xx、4xx，<br>仅当 <code>MetricNames =["l7Flow_request_hy"]</code> 时支持本维度。</li></ul><p>若 <code>DimensionName</code> 入参为空，默认按 <code>AppId</code> 维度汇总，只返回一组数据。</p><p>若 <code>DimensionName</code> 入参不为空，则按照传入的查询维度分组返回对应的时序数据。例如：</p><ul>当 <code>DimensionName = origin-status-code</code> 时：<ul><li>返回数据中 <code>TimingDataRecords.TypeKey</code> 为具体回源状态码，例如 200。</li><li>返回数据中 <code>TimingDataRecords.TypeValue</code> 是该状态码对应的时序数据。</li></ul></ul>
+	// <strong>注意</strong>：当指定 DimensionName 查询时，禁止并发调用。若超出查询频率限制，会返回错误 <code><strong>InvalidParameter.ActionInProgress</strong></code> 。
+	DimensionName *string `json:"DimensionName,omitnil,omitempty" name:"DimensionName"`
 }
 
 type DescribeTimingL7OriginPullDataRequest struct {
 	*tchttp.BaseRequest
 	
+	// 站点 ID 集合，此参数必填。最多传入 100 个站点 ID。若需查询腾讯云主账号下所有站点数据，请用 `*` 代替，查询账号级别数据需具备本接口全部站点资源权限。
+	ZoneIds []*string `json:"ZoneIds,omitnil,omitempty" name:"ZoneIds"`
+
+	// 指标列表，取值有:
+	// <ul><li>l7Flow_outFlux_hy: EdgeOne 节点至源站方向的请求流量，单位：Byte；</li>
+	// <li>l7Flow_outBandwidth_hy: EdgeOne 节点至源站方向的请求带宽，单位：bps；</li>
+	// <li>l7Flow_request_hy: EdgeOne 节点至源站方向的请求数，单位：次。</li>
+	// <li>l7Flow_inFlux_hy: 源站至 EdgeOne 节点方向的响应流量，单位：Byte；</li>
+	// <li>l7Flow_inBandwidth_hy: 源站至 EdgeOne 节点方向的响应带宽，单位：bps。</li></ul>
+	MetricNames []*string `json:"MetricNames,omitnil,omitempty" name:"MetricNames"`
+
 	// 开始时间。
 	StartTime *string `json:"StartTime,omitnil,omitempty" name:"StartTime"`
 
 	// 结束时间。查询时间范围（`EndTime` - `StartTime`）需小于等于 31 天。
 	EndTime *string `json:"EndTime,omitnil,omitempty" name:"EndTime"`
 
-	// 指标列表，取值有:
-	// <li>l7Flow_outFlux_hy: EdgeOne 节点至源站方向的请求流量，单位：Byte；</li>
-	// <li>l7Flow_outBandwidth_hy: EdgeOne 节点至源站方向的请求带宽，单位：bps；</li>
-	// <li>l7Flow_request_hy: EdgeOne 节点至源站方向的请求数，单位：次。</li>
-	// <li>l7Flow_inFlux_hy: 源站至 EdgeOne 节点方向的响应流量，单位：Byte；</li>
-	// <li>l7Flow_inBandwidth_hy: 源站至 EdgeOne 节点方向的响应带宽，单位：bps；</li>
-	MetricNames []*string `json:"MetricNames,omitnil,omitempty" name:"MetricNames"`
-
-	// 站点 ID 集合，此参数必填。最多传入 100 个站点 ID。若需查询腾讯云主账号下所有站点数据，请用 `*` 代替，查询账号级别数据需具备本接口全部站点资源权限。
-	ZoneIds []*string `json:"ZoneIds,omitnil,omitempty" name:"ZoneIds"`
-
 	// 查询时间粒度，取值有：
-	// <li>min: 1分钟；</li>
-	// <li>5min: 5分钟；</li>
-	// <li>hour: 1小时；</li>
-	// <li>day: 1天。</li>不填将根据开始时间跟结束时间的间距自动推算粒度，具体为：2 小时范围内以 min 粒度查询，2 天范围内以 5min 粒度查询，7 天范围内以 hour 粒度查询，超过 7 天以 day 粒度查询。
+	// <ul><li>min: 1分钟；</li><li>5min: 5分钟；</li><li>hour: 1小时；</li><li>day: 1天。</li></ul>不填将根据开始时间跟结束时间的间距自动推算粒度，具体为：2 小时范围内以 min 粒度查询，2 天范围内以 5min 粒度查询，7 天范围内以 hour 粒度查询，超过 7 天以 day 粒度查询。
 	Interval *string `json:"Interval,omitnil,omitempty" name:"Interval"`
 
 	// 过滤条件，详细的过滤条件如下：
-	// <li>domain：客户端请求的域名。若按泛域名接入 EdgeOne，则数据中记录为泛域名，而不是具体域名。</li>
+	// <ul><li><strong>domain</strong>：客户端请求的域名。若按泛域名接入 EdgeOne，则数据中记录为泛域名，而不是具体域名。</li><li><strong>originStatusCode</strong>：回源状态码，仅当 <code>MetricNames = ["l7Flow_request_hy"]</code> 时支持本过滤项。<br>对应的 Value 可选项如下：<ul><li><code>1xx</code>：1xx 类型的状态码；</li><li><code>2xx</code>：2xx 类型的状态码；</li><li><code>3xx</code>：3xx 类型的状态码；</li><li><code>4xx</code>：4xx 类型的状态码；</li><li><code>5xx</code>：5xx 类型的状态码；</li><li>在 <code>[0, 600)</code> 范围内的整数（不包括 600）。</li></ul></li></ul>
+	// **注意**：当 <code>DimensionName</code>  不为空时，仅支持 <code>equals</code> 运算符。
 	Filters []*QueryCondition `json:"Filters,omitnil,omitempty" name:"Filters"`
+
+	// <p>查询维度名称，取值有：</p><ul><li><strong>domain</strong>：客户端请求的域名。若按泛域名接入 EdgeOne，则数据中记录为泛域名。<br>使用 domain 维度时必须在 <code>Filters</code> 中包含 <code>domain</code> 过滤项，指定总数不超过 100 个需要查询的域名列表；</li><li><strong>origin-status-code</strong>：回源状态码，如 200、404，<br>仅当 <code>MetricNames = ["l7Flow_request_hy"]</code> 时支持本维度；</li><li><strong>origin-status-code-category</strong>：回源状态码类别，如 2xx、4xx，<br>仅当 <code>MetricNames =["l7Flow_request_hy"]</code> 时支持本维度。</li></ul><p>若 <code>DimensionName</code> 入参为空，默认按 <code>AppId</code> 维度汇总，只返回一组数据。</p><p>若 <code>DimensionName</code> 入参不为空，则按照传入的查询维度分组返回对应的时序数据。例如：</p><ul>当 <code>DimensionName = origin-status-code</code> 时：<ul><li>返回数据中 <code>TimingDataRecords.TypeKey</code> 为具体回源状态码，例如 200。</li><li>返回数据中 <code>TimingDataRecords.TypeValue</code> 是该状态码对应的时序数据。</li></ul></ul>
+	// <strong>注意</strong>：当指定 DimensionName 查询时，禁止并发调用。若超出查询频率限制，会返回错误 <code><strong>InvalidParameter.ActionInProgress</strong></code> 。
+	DimensionName *string `json:"DimensionName,omitnil,omitempty" name:"DimensionName"`
 }
 
 func (r *DescribeTimingL7OriginPullDataRequest) ToJsonString() string {
@@ -12377,12 +12648,13 @@ func (r *DescribeTimingL7OriginPullDataRequest) FromJsonString(s string) error {
 	if err := json.Unmarshal([]byte(s), &f); err != nil {
 		return err
 	}
+	delete(f, "ZoneIds")
+	delete(f, "MetricNames")
 	delete(f, "StartTime")
 	delete(f, "EndTime")
-	delete(f, "MetricNames")
-	delete(f, "ZoneIds")
 	delete(f, "Interval")
 	delete(f, "Filters")
+	delete(f, "DimensionName")
 	if len(f) > 0 {
 		return tcerr.NewTencentCloudSDKError("ClientError.BuildRequestError", "DescribeTimingL7OriginPullDataRequest has unknown keys!", "")
 	}
@@ -12445,7 +12717,7 @@ type DescribeTopL7AnalysisDataRequestParams struct {
 	// <li> l7Flow_request_url：按 URL Path 维度统计 L7 访问请求数指标; </li>
 	// <li> l7Flow_request_resourceType：按资源类型维度统计 L7 访问请求数指标；</li>
 	// <li> l7Flow_request_sip：按客户端 IP 维度统计 L7 访问请求数指标；</li>
-	// <li> l7Flow_request_referer：按 Referer 维度统计 L7 访问请求数指标；</li>
+	// <li> l7Flow_request_referers：按 Referer 维度统计 L7 访问请求数指标；</li>
 	// <li> l7Flow_request_ua_device：按设备类型维度统计 L7 访问请求数指标; </li>
 	// <li> l7Flow_request_ua_browser：按浏览器类型维度统计 L7 访问请求数指标；</li>
 	// <li> l7Flow_request_ua_os：按操作系统类型维度统计 L7 访问请求数指标；</li>
@@ -12498,7 +12770,7 @@ type DescribeTopL7AnalysisDataRequest struct {
 	// <li> l7Flow_request_url：按 URL Path 维度统计 L7 访问请求数指标; </li>
 	// <li> l7Flow_request_resourceType：按资源类型维度统计 L7 访问请求数指标；</li>
 	// <li> l7Flow_request_sip：按客户端 IP 维度统计 L7 访问请求数指标；</li>
-	// <li> l7Flow_request_referer：按 Referer 维度统计 L7 访问请求数指标；</li>
+	// <li> l7Flow_request_referers：按 Referer 维度统计 L7 访问请求数指标；</li>
 	// <li> l7Flow_request_ua_device：按设备类型维度统计 L7 访问请求数指标; </li>
 	// <li> l7Flow_request_ua_browser：按浏览器类型维度统计 L7 访问请求数指标；</li>
 	// <li> l7Flow_request_ua_os：按操作系统类型维度统计 L7 访问请求数指标；</li>
@@ -12989,8 +13261,7 @@ type DescribeZonesRequestParams struct {
 	// 分页查询限制数目。默认值：20，最大值：100。
 	Limit *int64 `json:"Limit,omitnil,omitempty" name:"Limit"`
 
-	// 过滤条件，Filters.Values 的上限为 20。该参数不填写时，返回当前 appid 下有权限的所有站点信息。详细的过滤条件如下：
-	// <li>zone-name：按照站点名称进行过滤；</li><li>zone-type：按照站点类型进行过滤。可选项：<br>   full：NS 接入类型；<br>   partial：CNAME 接入类型；<br>   partialComposite：无域名接入类型；<br>   dnsPodAccess：DNSPod 托管接入类型；<br>   pages：Pages 类型。</li><li>zone-id：按照站点 ID 进行过滤，站点 ID 形如：zone-2noz78a8ev6k；</li><li>status：按照站点状态进行过滤。可选项：<br>   active：NS 已切换；<br>   pending：NS 待切换；<br>   deleted：已删除。</li><li>tag-key：按照标签键进行过滤；</li><li>tag-value： 按照标签值进行过滤；</li><li>alias-zone-name： 按照同名站点标识进行过滤。</li>模糊查询时支持过滤字段名为 zone-name 或 alias-zone-name。
+	// 过滤条件，Filters.Values 的上限为 20。该参数不填写时，返回当前 appid 下有权限的所有站点信息。详细的过滤条件如下：<li>zone-name：按照站点名称进行过滤；</li><li>zone-type：按照站点类型进行过滤。可选项：<br>   full：NS 接入类型；<br>   partial：CNAME 接入类型；<br>   partialComposite：无域名接入类型；<br>   dnsPodAccess：DNSPod 托管接入类型；<br>   pages：Pages 接入类型。 </li><li>zone-id：按照站点 ID 进行过滤，站点 ID 形如：zone-2noz78a8ev6k；</li><li>status：按照站点状态进行过滤。可选项：<br>   active：NS 已切换；<br>   pending：NS 待切换；<br>   deleted：已删除。</li><li>tag-key：按照标签键进行过滤；</li><li>tag-value： 按照标签值进行过滤；</li><li>alias-zone-name： 按照同名站点标识进行过滤。</li>模糊查询时支持过滤字段名为 zone-name 或 alias-zone-name。
 	Filters []*AdvancedFilter `json:"Filters,omitnil,omitempty" name:"Filters"`
 
 	// 可根据该字段对返回结果进行排序，取值有：
@@ -13017,8 +13288,7 @@ type DescribeZonesRequest struct {
 	// 分页查询限制数目。默认值：20，最大值：100。
 	Limit *int64 `json:"Limit,omitnil,omitempty" name:"Limit"`
 
-	// 过滤条件，Filters.Values 的上限为 20。该参数不填写时，返回当前 appid 下有权限的所有站点信息。详细的过滤条件如下：
-	// <li>zone-name：按照站点名称进行过滤；</li><li>zone-type：按照站点类型进行过滤。可选项：<br>   full：NS 接入类型；<br>   partial：CNAME 接入类型；<br>   partialComposite：无域名接入类型；<br>   dnsPodAccess：DNSPod 托管接入类型；<br>   pages：Pages 类型。</li><li>zone-id：按照站点 ID 进行过滤，站点 ID 形如：zone-2noz78a8ev6k；</li><li>status：按照站点状态进行过滤。可选项：<br>   active：NS 已切换；<br>   pending：NS 待切换；<br>   deleted：已删除。</li><li>tag-key：按照标签键进行过滤；</li><li>tag-value： 按照标签值进行过滤；</li><li>alias-zone-name： 按照同名站点标识进行过滤。</li>模糊查询时支持过滤字段名为 zone-name 或 alias-zone-name。
+	// 过滤条件，Filters.Values 的上限为 20。该参数不填写时，返回当前 appid 下有权限的所有站点信息。详细的过滤条件如下：<li>zone-name：按照站点名称进行过滤；</li><li>zone-type：按照站点类型进行过滤。可选项：<br>   full：NS 接入类型；<br>   partial：CNAME 接入类型；<br>   partialComposite：无域名接入类型；<br>   dnsPodAccess：DNSPod 托管接入类型；<br>   pages：Pages 接入类型。 </li><li>zone-id：按照站点 ID 进行过滤，站点 ID 形如：zone-2noz78a8ev6k；</li><li>status：按照站点状态进行过滤。可选项：<br>   active：NS 已切换；<br>   pending：NS 待切换；<br>   deleted：已删除。</li><li>tag-key：按照标签键进行过滤；</li><li>tag-value： 按照标签值进行过滤；</li><li>alias-zone-name： 按照同名站点标识进行过滤。</li>模糊查询时支持过滤字段名为 zone-name 或 alias-zone-name。
 	Filters []*AdvancedFilter `json:"Filters,omitnil,omitempty" name:"Filters"`
 
 	// 可根据该字段对返回结果进行排序，取值有：
@@ -15052,7 +15322,10 @@ type L4Proxy struct {
 	AccelerateMainland *string `json:"AccelerateMainland,omitnil,omitempty" name:"AccelerateMainland"`
 
 	// 安全防护配置。
+	// 本字段已废弃。
 	// 注意：此字段可能返回 null，表示取不到有效值。
+	//
+	// Deprecated: DDosProtectionConfig is deprecated.
 	DDosProtectionConfig *DDosProtectionConfig `json:"DDosProtectionConfig,omitnil,omitempty" name:"DDosProtectionConfig"`
 
 	// 四层代理实例下的转发规则数量。
@@ -15221,6 +15494,9 @@ type LoadBalancer struct {
 
 	// 该负载均衡实例绑定的七层域名列表。
 	L7UsedList []*string `json:"L7UsedList,omitnil,omitempty" name:"L7UsedList"`
+
+	// 负载均衡被引用实例的列表。
+	References []*OriginGroupReference `json:"References,omitnil,omitempty" name:"References"`
 }
 
 type LogFormat struct {
@@ -16750,9 +17026,9 @@ type ModifyHostsCertificateRequestParams struct {
 	// <li>eofreecert：通过自动验证申请免费证书并部署。验证方式详见：[申请免费证书支持的验证方式](https://cloud.tencent.com/document/product/1552/90437)
 	// 
 	// - 在 NS 或者 DNSPod 托管接入模式下，仅支持自动验证的方式申请免费证书。
-	// - 当免费证书申请失败时会导致证书部署失败，您可以通过<a href = 'https://tcloud4api.woa.com/document/product/1657/927938?!preview&!document=1'>检查免费证书申请结果</a>接口获取申请失败原因。</li>
-	// </ul><li>eofreecert_manual：部署 DNS 委派验证或者文件验证申请的免费证书。在部署免费证书前，您需要触发<a href = 'https://tcloud4api.woa.com/document/product/1657/927322?!preview&!document=1'>申请免费证书</a>接口申请免费证书。在免费证书申请成功后，你可以通过该枚举值对免费证书进行部署；</li>
-	// <ul><li>注意：在对免费证书部署时，需要保证当前已存在申请成功的免费证书。您可以通过<a href = 'https://tcloud4api.woa.com/document/product/1657/927938?!preview&!document=1'>检查免费证书申请结果</a>接口检查当前是否已存在申请成功的免费证书。</li>
+	// - 当免费证书申请失败时会导致证书部署失败，您可以通过<a href = 'https://cloud.tencent.com/document/product/1552/124806'>检查免费证书申请结果</a>接口获取申请失败原因。</li>
+	// </ul><li>eofreecert_manual：部署 DNS 委派验证或者文件验证申请的免费证书。在部署免费证书前，您需要触发<a href = 'https://cloud.tencent.com/document/product/1552/124807'>申请免费证书</a>接口申请免费证书。在免费证书申请成功后，你可以通过该枚举值对免费证书进行部署；</li>
+	// <ul><li>注意：在对免费证书部署时，需要保证当前已存在申请成功的免费证书。您可以通过<a href = 'https://cloud.tencent.com/document/product/1552/124806'>检查免费证书申请结果</a>接口检查当前是否已存在申请成功的免费证书。</li>
 	// </ul><li>sslcert：配置 SSL 托管服务端证书。</li>
 	Mode *string `json:"Mode,omitnil,omitempty" name:"Mode"`
 
@@ -16770,7 +17046,7 @@ type ModifyHostsCertificateRequestParams struct {
 	// 在边缘双向认证场景下，该字段为客户端的 CA 证书，部署在 EO 节点内，用于客户端对 EO 节点进行认证。默认关闭，不填写表示保持原有配置。
 	ClientCertInfo *MutualTLS `json:"ClientCertInfo,omitnil,omitempty" name:"ClientCertInfo"`
 
-	// 用于配置 EO 节点回源时携带的证书，用于回源双向认证握手，默认关闭，不填写表示保持原有配置。该配置当前为白名单内测中，如需使用，请[联系我们](https://cloud.tencent.com/online-service)。
+	// 用于分别开启/关闭回源双向认证和源站证书校验。默认关闭，不填写表示保持原有配置。回源双向认证配置当前为白名单内侧中，如需使用，请[联系我们](https://cloud.tencent.com/online-service)。
 	UpstreamCertInfo *UpstreamCertInfo `json:"UpstreamCertInfo,omitnil,omitempty" name:"UpstreamCertInfo"`
 }
 
@@ -16788,9 +17064,9 @@ type ModifyHostsCertificateRequest struct {
 	// <li>eofreecert：通过自动验证申请免费证书并部署。验证方式详见：[申请免费证书支持的验证方式](https://cloud.tencent.com/document/product/1552/90437)
 	// 
 	// - 在 NS 或者 DNSPod 托管接入模式下，仅支持自动验证的方式申请免费证书。
-	// - 当免费证书申请失败时会导致证书部署失败，您可以通过<a href = 'https://tcloud4api.woa.com/document/product/1657/927938?!preview&!document=1'>检查免费证书申请结果</a>接口获取申请失败原因。</li>
-	// </ul><li>eofreecert_manual：部署 DNS 委派验证或者文件验证申请的免费证书。在部署免费证书前，您需要触发<a href = 'https://tcloud4api.woa.com/document/product/1657/927322?!preview&!document=1'>申请免费证书</a>接口申请免费证书。在免费证书申请成功后，你可以通过该枚举值对免费证书进行部署；</li>
-	// <ul><li>注意：在对免费证书部署时，需要保证当前已存在申请成功的免费证书。您可以通过<a href = 'https://tcloud4api.woa.com/document/product/1657/927938?!preview&!document=1'>检查免费证书申请结果</a>接口检查当前是否已存在申请成功的免费证书。</li>
+	// - 当免费证书申请失败时会导致证书部署失败，您可以通过<a href = 'https://cloud.tencent.com/document/product/1552/124806'>检查免费证书申请结果</a>接口获取申请失败原因。</li>
+	// </ul><li>eofreecert_manual：部署 DNS 委派验证或者文件验证申请的免费证书。在部署免费证书前，您需要触发<a href = 'https://cloud.tencent.com/document/product/1552/124807'>申请免费证书</a>接口申请免费证书。在免费证书申请成功后，你可以通过该枚举值对免费证书进行部署；</li>
+	// <ul><li>注意：在对免费证书部署时，需要保证当前已存在申请成功的免费证书。您可以通过<a href = 'https://cloud.tencent.com/document/product/1552/124806'>检查免费证书申请结果</a>接口检查当前是否已存在申请成功的免费证书。</li>
 	// </ul><li>sslcert：配置 SSL 托管服务端证书。</li>
 	Mode *string `json:"Mode,omitnil,omitempty" name:"Mode"`
 
@@ -16806,7 +17082,7 @@ type ModifyHostsCertificateRequest struct {
 	// 在边缘双向认证场景下，该字段为客户端的 CA 证书，部署在 EO 节点内，用于客户端对 EO 节点进行认证。默认关闭，不填写表示保持原有配置。
 	ClientCertInfo *MutualTLS `json:"ClientCertInfo,omitnil,omitempty" name:"ClientCertInfo"`
 
-	// 用于配置 EO 节点回源时携带的证书，用于回源双向认证握手，默认关闭，不填写表示保持原有配置。该配置当前为白名单内测中，如需使用，请[联系我们](https://cloud.tencent.com/online-service)。
+	// 用于分别开启/关闭回源双向认证和源站证书校验。默认关闭，不填写表示保持原有配置。回源双向认证配置当前为白名单内侧中，如需使用，请[联系我们](https://cloud.tencent.com/online-service)。
 	UpstreamCertInfo *UpstreamCertInfo `json:"UpstreamCertInfo,omitnil,omitempty" name:"UpstreamCertInfo"`
 }
 
@@ -18018,6 +18294,102 @@ func (r *ModifyPlanResponse) FromJsonString(s string) error {
 }
 
 // Predefined struct for user
+type ModifyPrefetchOriginLimitRequestParams struct {
+	// 站点 ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 加速域名。
+	DomainName *string `json:"DomainName,omitnil,omitempty" name:"DomainName"`
+
+	// 回源限速限制的加速区域。
+	// 预热时，该加速区域将会受到配置的Bandwidth值限制。取值有：
+	// <li>Overseas：全球可用区（不含中国大陆）；</li>
+	// <li>MainlandChina：中国大陆可用区。</li>
+	Area *string `json:"Area,omitnil,omitempty" name:"Area"`
+
+	// 回源限速带宽。
+	// 预热时回到源站的带宽上限值，取值范围 100 - 100,000，单位 Mbps。
+	Bandwidth *int64 `json:"Bandwidth,omitnil,omitempty" name:"Bandwidth"`
+
+	// 回源限速限制控制开关。
+	// 用于启用/删除本条回源限速限制，取值有：
+	// <li>on：启用限制；</li>
+	// <li>off：删除限制。</li>
+	Enabled *string `json:"Enabled,omitnil,omitempty" name:"Enabled"`
+}
+
+type ModifyPrefetchOriginLimitRequest struct {
+	*tchttp.BaseRequest
+	
+	// 站点 ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 加速域名。
+	DomainName *string `json:"DomainName,omitnil,omitempty" name:"DomainName"`
+
+	// 回源限速限制的加速区域。
+	// 预热时，该加速区域将会受到配置的Bandwidth值限制。取值有：
+	// <li>Overseas：全球可用区（不含中国大陆）；</li>
+	// <li>MainlandChina：中国大陆可用区。</li>
+	Area *string `json:"Area,omitnil,omitempty" name:"Area"`
+
+	// 回源限速带宽。
+	// 预热时回到源站的带宽上限值，取值范围 100 - 100,000，单位 Mbps。
+	Bandwidth *int64 `json:"Bandwidth,omitnil,omitempty" name:"Bandwidth"`
+
+	// 回源限速限制控制开关。
+	// 用于启用/删除本条回源限速限制，取值有：
+	// <li>on：启用限制；</li>
+	// <li>off：删除限制。</li>
+	Enabled *string `json:"Enabled,omitnil,omitempty" name:"Enabled"`
+}
+
+func (r *ModifyPrefetchOriginLimitRequest) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *ModifyPrefetchOriginLimitRequest) FromJsonString(s string) error {
+	f := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(s), &f); err != nil {
+		return err
+	}
+	delete(f, "ZoneId")
+	delete(f, "DomainName")
+	delete(f, "Area")
+	delete(f, "Bandwidth")
+	delete(f, "Enabled")
+	if len(f) > 0 {
+		return tcerr.NewTencentCloudSDKError("ClientError.BuildRequestError", "ModifyPrefetchOriginLimitRequest has unknown keys!", "")
+	}
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type ModifyPrefetchOriginLimitResponseParams struct {
+	// 唯一请求 ID，由服务端生成，每次请求都会返回（若请求因其他原因未能抵达服务端，则该次请求不会获得 RequestId）。定位问题时需要提供该次请求的 RequestId。
+	RequestId *string `json:"RequestId,omitnil,omitempty" name:"RequestId"`
+}
+
+type ModifyPrefetchOriginLimitResponse struct {
+	*tchttp.BaseResponse
+	Response *ModifyPrefetchOriginLimitResponseParams `json:"Response"`
+}
+
+func (r *ModifyPrefetchOriginLimitResponse) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *ModifyPrefetchOriginLimitResponse) FromJsonString(s string) error {
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
 type ModifyRealtimeLogDeliveryTaskRequestParams struct {
 	// 站点 ID。
 	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
@@ -18922,6 +19294,9 @@ type ModifyZoneSettingRequestParams struct {
 	// 不填写表示保持原有配置。
 	Grpc *Grpc `json:"Grpc,omitnil,omitempty" name:"Grpc"`
 
+	// 网络错误日志记录配置。不填写表示保持原有配置。
+	NetworkErrorLogging *NetworkErrorLogging `json:"NetworkErrorLogging,omitnil,omitempty" name:"NetworkErrorLogging"`
+
 	// 图片优化配置。
 	// 不填写表示关闭。
 	ImageOptimize *ImageOptimize `json:"ImageOptimize,omitnil,omitempty" name:"ImageOptimize"`
@@ -19011,6 +19386,9 @@ type ModifyZoneSettingRequest struct {
 	// 不填写表示保持原有配置。
 	Grpc *Grpc `json:"Grpc,omitnil,omitempty" name:"Grpc"`
 
+	// 网络错误日志记录配置。不填写表示保持原有配置。
+	NetworkErrorLogging *NetworkErrorLogging `json:"NetworkErrorLogging,omitnil,omitempty" name:"NetworkErrorLogging"`
+
 	// 图片优化配置。
 	// 不填写表示关闭。
 	ImageOptimize *ImageOptimize `json:"ImageOptimize,omitnil,omitempty" name:"ImageOptimize"`
@@ -19053,6 +19431,7 @@ func (r *ModifyZoneSettingRequest) FromJsonString(s string) error {
 	delete(f, "Ipv6")
 	delete(f, "ClientIpCountry")
 	delete(f, "Grpc")
+	delete(f, "NetworkErrorLogging")
 	delete(f, "ImageOptimize")
 	delete(f, "StandardDebug")
 	delete(f, "JITVideoProcess")
@@ -19146,6 +19525,67 @@ func (r *ModifyZoneStatusResponse) ToJsonString() string {
 // FromJsonString It is highly **NOT** recommended to use this function
 // because it has no param check, nor strict type check
 func (r *ModifyZoneStatusResponse) FromJsonString(s string) error {
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type ModifyZoneWorkModeRequestParams struct {
+	// 站点 ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 版本管理配置组工作模式。站点各配置模块可按照配置组维度开启「版本管理模式」或「即时生效模式」，详情请参考 [版本管理](https://cloud.tencent.com/document/product/1552/113690)。
+	WorkModeInfos []*ConfigGroupWorkModeInfo `json:"WorkModeInfos,omitnil,omitempty" name:"WorkModeInfos"`
+}
+
+type ModifyZoneWorkModeRequest struct {
+	*tchttp.BaseRequest
+	
+	// 站点 ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 版本管理配置组工作模式。站点各配置模块可按照配置组维度开启「版本管理模式」或「即时生效模式」，详情请参考 [版本管理](https://cloud.tencent.com/document/product/1552/113690)。
+	WorkModeInfos []*ConfigGroupWorkModeInfo `json:"WorkModeInfos,omitnil,omitempty" name:"WorkModeInfos"`
+}
+
+func (r *ModifyZoneWorkModeRequest) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *ModifyZoneWorkModeRequest) FromJsonString(s string) error {
+	f := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(s), &f); err != nil {
+		return err
+	}
+	delete(f, "ZoneId")
+	delete(f, "WorkModeInfos")
+	if len(f) > 0 {
+		return tcerr.NewTencentCloudSDKError("ClientError.BuildRequestError", "ModifyZoneWorkModeRequest has unknown keys!", "")
+	}
+	return json.Unmarshal([]byte(s), &r)
+}
+
+// Predefined struct for user
+type ModifyZoneWorkModeResponseParams struct {
+	// 唯一请求 ID，由服务端生成，每次请求都会返回（若请求因其他原因未能抵达服务端，则该次请求不会获得 RequestId）。定位问题时需要提供该次请求的 RequestId。
+	RequestId *string `json:"RequestId,omitnil,omitempty" name:"RequestId"`
+}
+
+type ModifyZoneWorkModeResponse struct {
+	*tchttp.BaseResponse
+	Response *ModifyZoneWorkModeResponseParams `json:"Response"`
+}
+
+func (r *ModifyZoneWorkModeResponse) ToJsonString() string {
+    b, _ := json.Marshal(r)
+    return string(b)
+}
+
+// FromJsonString It is highly **NOT** recommended to use this function
+// because it has no param check, nor strict type check
+func (r *ModifyZoneWorkModeResponse) FromJsonString(s string) error {
 	return json.Unmarshal([]byte(s), &r)
 }
 
@@ -19284,6 +19724,20 @@ type NSDetail struct {
 	VanityNameServersIps []*VanityNameServersIps `json:"VanityNameServersIps,omitnil,omitempty" name:"VanityNameServersIps"`
 }
 
+type NetworkErrorLogging struct {
+	// 是否开启网络错误日志记录配置，取值有：
+	// <li>on：开启；</li>
+	// <li>off：关闭。</li>
+	Switch *string `json:"Switch,omitnil,omitempty" name:"Switch"`
+}
+
+type NetworkErrorLoggingParameters struct {
+	// 网络错误日志记录配置开关，取值有：
+	// <li>on：开启；</li>
+	// <li>off：关闭。</li>
+	Switch *string `json:"Switch,omitnil,omitempty" name:"Switch"`
+}
+
 type NextOriginACL struct {
 	// 版本号。
 	Version *string `json:"Version,omitnil,omitempty" name:"Version"`
@@ -19401,6 +19855,31 @@ type OriginACLInfo struct {
 	// <li>offline：已停用；</li>
 	// <li>updating: 配置部署中。</li>
 	Status *string `json:"Status,omitnil,omitempty" name:"Status"`
+}
+
+type OriginAuthenticationParameters struct {
+	// 回源鉴权请求属性。
+	RequestProperties []*OriginAuthenticationRequestProperties `json:"RequestProperties,omitnil,omitempty" name:"RequestProperties"`
+}
+
+type OriginAuthenticationRequestProperties struct {
+	// 设置回源鉴权参数类型，取值有：<li>QueryString：表示设置回源鉴权参数类型为查询字符串；</li><li>Header：表示设置回源鉴权参数类型为请求头。</li>
+	Type *string `json:"Type,omitnil,omitempty" name:"Type"`
+
+	// 设置回源鉴权类型对应的参数名称。
+	Name *string `json:"Name,omitnil,omitempty" name:"Name"`
+
+	// 设置回源鉴权类型对应的参数值。
+	Value *string `json:"Value,omitnil,omitempty" name:"Value"`
+}
+
+type OriginCertificateVerify struct {
+	// 源站证书校验模式。取值有：<li>disable:禁用源站证书校验。</li><li>custom_ca:使用指定受信任 CA 证书校验。</li>
+	VerificationMode *string `json:"VerificationMode,omitnil,omitempty" name:"VerificationMode"`
+
+	// 指定受信任的 CA 证书列表，源站证书需要由该 CA 签发才能校验通过。 注意：仅当 VerificationMode 为 custom_ca 时，需要传入该参数，指定受信任的CA证书信息。
+	// OriginCertificateVerify 在 ModifyHostsCertificate 作为入参使用时，该参数传入对应证书的 CertId 即可。您可以前往 [SSL 证书列表](https://console.cloud.tencent.com/ssl) 查看 CertId。	
+	CustomCACerts []*CertificateInfo `json:"CustomCACerts,omitnil,omitempty" name:"CustomCACerts"`
 }
 
 type OriginDetail struct {
@@ -19538,17 +20017,26 @@ type OriginGroupInLoadBalancer struct {
 
 type OriginGroupReference struct {
 	// 引用服务类型，取值有：
-	// <li>AccelerationDomain: 加速域名；</li>
-	// <li>RuleEngine: 规则引擎；</li>
-	// <li>Loadbalance: 负载均衡；</li>
-	// <li>ApplicationProxy: 四层代理。</li>
+	// <li>acceleration-domain: 加速域名；</li>
+	// <li>rule-engine: 规则引擎；</li>
+	// <li>load-balancer: 负载均衡；</li>
+	// <li>application-proxy: 四层代理。</li>
 	InstanceType *string `json:"InstanceType,omitnil,omitempty" name:"InstanceType"`
 
 	// 引用类型的实例ID。
 	InstanceId *string `json:"InstanceId,omitnil,omitempty" name:"InstanceId"`
 
-	// 应用类型的实例名称。
+	// 引用类型的实例名称。
 	InstanceName *string `json:"InstanceName,omitnil,omitempty" name:"InstanceName"`
+
+	// 引用站点ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 引用站点名称。
+	ZoneName *string `json:"ZoneName,omitnil,omitempty" name:"ZoneName"`
+
+	// 引用站点别名。
+	AliasZoneName *string `json:"AliasZoneName,omitnil,omitempty" name:"AliasZoneName"`
 }
 
 type OriginHealthStatus struct {
@@ -19875,7 +20363,7 @@ type PostMaxSize struct {
 	// <li>off：关闭限制。</li>
 	Switch *string `json:"Switch,omitnil,omitempty" name:"Switch"`
 
-	// 最大限制，取值在1MB和500MB之间。单位字节。
+	// 最大限制，该字段仅在 Switch 为 on 时生效，取值在 1MB 和 800MB 之间，单位字节。
 	MaxSize *int64 `json:"MaxSize,omitnil,omitempty" name:"MaxSize"`
 }
 
@@ -19883,8 +20371,32 @@ type PostMaxSizeParameters struct {
 	// 是否开启 POST 请求上传文件限制，单位为 Byte，平台默认为限制为 32 * 2<sup>20</sup> Byte，取值有：<li>on：开启限制；</li><li>off：关闭限制。</li>
 	Switch *string `json:"Switch,omitnil,omitempty" name:"Switch"`
 
-	// POST 请求上传文件流式传输最大限制，单位为 Byte，取值：1 * 2<sup>20</sup> Byte～500 * 2<sup>20</sup> Byte。
+	// POST 请求上传文件流式传输最大限制，该字段仅在 Switch 为 on 时生效，取值在 1MB 和 800MB 之间，单位字节。
 	MaxSize *int64 `json:"MaxSize,omitnil,omitempty" name:"MaxSize"`
+}
+
+type PrefetchOriginLimit struct {
+	// 站点 ID。
+	ZoneId *string `json:"ZoneId,omitnil,omitempty" name:"ZoneId"`
+
+	// 加速域名。
+	DomainName *string `json:"DomainName,omitnil,omitempty" name:"DomainName"`
+
+	// 回源限速限制的加速区域。
+	// 预热时，该加速区域将会受到配置的Bandwidth值限制。取值有：
+	// <li>Overseas：全球可用区（不含中国大陆）；</li>
+	// <li>MainlandChina：中国大陆可用区。</li>
+	Area *string `json:"Area,omitnil,omitempty" name:"Area"`
+
+	// 回源限速带宽。
+	// 预热时回到源站的带宽上限值，取值范围 100 - 100,000，单位 Mbps。
+	Bandwidth *int64 `json:"Bandwidth,omitnil,omitempty" name:"Bandwidth"`
+
+	// 回源限速限制创建的时间。
+	CreateTime *string `json:"CreateTime,omitnil,omitempty" name:"CreateTime"`
+
+	// 回源限速限制更新的时间。
+	UpdateTime *string `json:"UpdateTime,omitnil,omitempty" name:"UpdateTime"`
 }
 
 type PrepaidPlanParam struct {
@@ -20177,7 +20689,7 @@ type RealtimeLogDeliveryTask struct {
 	// 实时日志投递任务的状态，取值有： <li>enabled: 已启用；</li> <li>disabled: 已停用；</li><li>deleted: 异常删除状态，请检查目的地腾讯云 CLS 日志集/日志主题是否已被删除。</li>
 	DeliveryStatus *string `json:"DeliveryStatus,omitnil,omitempty" name:"DeliveryStatus"`
 
-	// 实时日志投递任务类型，取值有： <li>cls: 推送到腾讯云 CLS；</li> <li>custom_endpoint：推送到自定义 HTTP(S) 地址；</li> <li>s3：推送到 AWS S3 兼容存储桶地址。</li>
+	// 实时日志投递任务类型，取值有： <li>cls: 推送到腾讯云 CLS；</li> <li>custom_endpoint：推送到自定义 HTTP(S) 地址；</li> <li>s3：推送到 AWS S3 兼容存储桶地址；</li><li>log_analysis：推送到 EdgeOne 日志分析。</li>
 	TaskType *string `json:"TaskType,omitnil,omitempty" name:"TaskType"`
 
 	// 实时日志投递任务对应的实体（七层域名或者四层代理实例）列表。取值示例如下： <li>七层域名：domain.example.com；</li> <li>四层代理实例：sid-2s69eb5wcms7。</li>	
@@ -20643,7 +21155,9 @@ type RuleEngineAction struct {
 	// <li>ModifyRequestHeader：修改 HTTP 节点请求头；</li>
 	// <li>ResponseSpeedLimit：单连接下载限速；</li>
 	// <li>SetContentIdentifier：设置内容标识符；</li>
-	// <li>Vary：Vary 特性配置。</li>
+	// <li>Vary：Vary 特性配置；</li>
+	// <li>ContentCompression：内容压缩配置；</li>
+	// <li>OriginAuthentication：回源鉴权配置。</li>
 	Name *string `json:"Name,omitnil,omitempty" name:"Name"`
 
 	// 节点缓存 TTL 配置参数，当 Name 取值为 Cache 时，该参数必填。
@@ -20792,6 +21306,9 @@ type RuleEngineAction struct {
 
 	// 内容压缩配置参数，当 Name 取值为 ContentCompression 时，该参数必填。该参数为白名单功能，如有需要，请联系腾讯云工程师处理。
 	ContentCompressionParameters *ContentCompressionParameters `json:"ContentCompressionParameters,omitnil,omitempty" name:"ContentCompressionParameters"`
+
+	// 回源鉴权配置参数，当 Name 取值为 OriginAuthentication 时，该参数必填。该参数为白名单功能，如有需要，请联系腾讯云工程师处理。
+	OriginAuthenticationParameters *OriginAuthenticationParameters `json:"OriginAuthenticationParameters,omitnil,omitempty" name:"OriginAuthenticationParameters"`
 }
 
 type RuleEngineItem struct {
@@ -21621,6 +22138,9 @@ func (r *UpgradePlanResponse) FromJsonString(s string) error {
 type UpstreamCertInfo struct {
 	// 在回源双向认证场景下，该字段为 EO 节点回源时携带的证书（包含公钥、私钥即可），部署在 EO 节点，用于源站对 EO 节点进行认证。在作为入参使用时，不填写表示保持原有配置。
 	UpstreamMutualTLS *MutualTLS `json:"UpstreamMutualTLS,omitnil,omitempty" name:"UpstreamMutualTLS"`
+
+	// 在源站证书校验场景下，该字段为 EO 节点回源时用于验证的 CA 证书，部署在 EO 节点，用于 EO 节点对服务端证书进行认证。在作为入参使用时，不填写表示保持原有配置。
+	UpstreamCertificateVerify *OriginCertificateVerify `json:"UpstreamCertificateVerify,omitnil,omitempty" name:"UpstreamCertificateVerify"`
 }
 
 type UpstreamFollowRedirectParameters struct {
@@ -21994,6 +22514,9 @@ type Zone struct {
 	// 用户自定义 NS IP 信息。（该字段为历史保留字段，已不再维护，请根据站点类型参考对应字段）
 	// 注意：此字段可能返回 null，表示取不到有效值。
 	VanityNameServersIps []*VanityNameServersIps `json:"VanityNameServersIps,omitnil,omitempty" name:"VanityNameServersIps"`
+
+	// 版本管理配置组工作模式。站点各配置模块可按照配置组维度开启「版本管理模式」或「即时生效模式」，详情请参考 [版本管理](https://cloud.tencent.com/document/product/1552/113690)。
+	WorkModeInfos []*ConfigGroupWorkModeInfo `json:"WorkModeInfos,omitnil,omitempty" name:"WorkModeInfos"`
 }
 
 type ZoneConfig struct {
@@ -22076,6 +22599,10 @@ type ZoneConfig struct {
 	// gRPC 协议支持配置。
 	// 注意：此字段可能返回 null，表示取不到有效值。
 	Grpc *GrpcParameters `json:"Grpc,omitnil,omitempty" name:"Grpc"`
+
+	// 网络错误日志记录配置。
+	// 注意：此字段可能返回 null，表示取不到有效值。
+	NetworkErrorLogging *NetworkErrorLoggingParameters `json:"NetworkErrorLogging,omitnil,omitempty" name:"NetworkErrorLogging"`
 
 	// 中国大陆加速优化配置。
 	// 注意：此字段可能返回 null，表示取不到有效值。
@@ -22187,6 +22714,10 @@ type ZoneSetting struct {
 	// Grpc协议支持配置。
 	// 注意：此字段可能返回 null，表示取不到有效值。
 	Grpc *Grpc `json:"Grpc,omitnil,omitempty" name:"Grpc"`
+
+	// 网络错误日志记录配置。
+	// 注意：此字段可能返回 null，表示取不到有效值。
+	NetworkErrorLogging *NetworkErrorLogging `json:"NetworkErrorLogging,omitnil,omitempty" name:"NetworkErrorLogging"`
 
 	// 图片优化相关配置。
 	// 注意：此字段可能返回 null，表示取不到有效值。
